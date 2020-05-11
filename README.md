@@ -1,4 +1,4 @@
-![](images/SBA_loan.jpg)
+![](images/SBA_loan_header.jpg)
 
 # Table of Contents
 1. [Background & Motivation](#background)
