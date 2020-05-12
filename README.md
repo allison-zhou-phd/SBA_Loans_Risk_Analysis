@@ -2,9 +2,10 @@
 
 # Table of Contents
 1. [Background & Motivation](#background)
-2. [Data & EDA](#data)
-3. [Models & Comparison](#model)
-4. [Results](#result)
+2. [Data](#data)
+3. [EDA](#eda)
+4. [Models](#model)
+5. [Results](#result)
 
 
 ## Background & Motivation <a name="background"></a>
@@ -52,7 +53,7 @@ I found the dataset on kaggle.com, though it originally came from the U.S. SBA. 
 
 The following actions are taken to transform the data:
 
-* __NAICS__ (North American Industry Classification System):  This is a 2- through 6-digit hierachical classfication system used by the Federal agencies to classify business establishments for the statiscial collection, analysis, ana presentation of data.  The first two digits of NAICS represents the economic sector.  Even though the original data contains the 6-digit code (despite many missing values), efforts are taken to reduce the code to the first two digits, therefore summarizing the loans to sector level.  The below table shows the description of the NAICS sectors, with more details found on the [U.S. Census page](https://www.census.gov/cgi-bin/sssd/naics/naicsrch?chart=2017)
+* __NAICS__ (North American Industry Classification System):  This is a 2- through 6-digit hierachical classfication system used by the Federal agencies to classify business establishments for the statiscial collection, analysis, ana presentation of data.  The first two digits of NAICS represents the economic sector.  Even though the original data contains the 6-digit code (despite many missing values), efforts are taken to reduce the code to the first two digits, therefore summarizing the loans to sector level.  The below table shows the description of the NAICS sectors, with more details found on the [U.S. Census page](https://www.census.gov/cgi-bin/sssd/naics/naicsrch?chart=2017).
 
    | Sector | Description                                                              |
    |--------|--------------------------------------------------------------------------|
@@ -79,11 +80,19 @@ The following actions are taken to transform the data:
 
 * __ApprovalFY__: In the original data set, there are 18 observations with ApprovalFY='1976A'.  I am not able to find what the 'A' indicates.  I choose to convert these values to 1976, thereby collapsing these 18 data points to be with ApprovalFY='1976'.
 
-* __Franchise__: The original data set has mixed entry for this variable.  Entries '0000' and '0001' indicate there is no franchise, and franchise codes are entered wherever franchises are involved.  I choose to convert this variable to a boolean type with 0 indicating no franchise and 1 otherwise. 
+* __Franchise__: The original data set has mixed entry for this variable.  Entries '0000' and '0001' indicate there is no franchise, and franchise codes are entered wherever franchises are involved.  I choose to convert this variable to a Boolean type with 0 indicating no franchise and 1 otherwise. 
 
 * __NewExist__ (1=Existing Business, 2=New Business): I choose to convert this variable to a Boolean type variable __NewBiz__ with 0 indicating existing business and 1 new business. 
 
-* __LowDoc__ (Y=Yes, N=No): In order to 
+* __LowDoc__ (Y=Yes, N=No): SBA implemented a "LowDoc Loan" program where loans under $150,000 can be processed using just a one-page application.  This is done for the goal of processing more loans efficiently.  I choose to convert this variable to a Boolean type variable __LowDocu__ where original values of '0' or 'N' corresponds to 0 and original values of '1' or 'Y' corresponds to 1. 
+
+* __MIS_Status__: This is the target variable that we are interested in.  I choose to convert the variable to a Boolean type variable __Default__ where 1=CHGOFF and 0=PIF. 
+
+* __Currency_Variables__:  The original data variables with type = 'Currency' are formated in the accounting way with "$" and "," separators. These are converted to the float data type. 
+
+## EDA <a name="eda"></a>
+
+![](images/default_state.png)
 
 ## Models & Comparison <a name="model"></a>
 

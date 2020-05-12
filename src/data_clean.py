@@ -1,11 +1,9 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from datetime import datetime 
 
 def pd_columnToNumber(df,col_name):
     for c in col_name:
-        #df[c] = np.vectorize(stringToNumber)(df[c])
         df[c] = [stringToNumber(x) for x in df[c]]
     return df
 
@@ -19,7 +17,6 @@ def stringToNumber(s):
     Returns:
     float number
     """
-    #breakpoint()
     if type(s).__name__=="str":
         s = s.strip()
         if s =="-":
@@ -44,7 +41,6 @@ def fix_Date_Year(df, col_1, col_2):
         #year2 = df[col_2][idx]
         year2 = df.loc[idx, col_2]
         if np.abs(year1-year2)>95:
-            #breakpoint()
             year1 -=100
             #df[idx,col_1]=df[col_1][idx].replace(year=year1)
             df.loc[idx, col_1]=df.loc[idx, col_1].replace(year=year1)
@@ -67,4 +63,4 @@ if __name__ == "__main__":
                   'CreateJob','RetainedJob','Franchise','UrbanRural','LowDocu','DisburseDate','DisburseGross','GrAppv','SBA_Appv','Default']]
     df_loan = fix_Date_Year(df_loan, 'ApprovalDate', 'ApprovalFY')
     df_loan = df_loan.dropna()
-    df.to_pickle('data/pickled_loan')   
+    df_loan.to_pickle('data/pickled_loan')   
