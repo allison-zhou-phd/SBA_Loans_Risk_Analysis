@@ -50,6 +50,40 @@ I found the dataset on kaggle.com, though it originally came from the U.S. SBA. 
 | GrAppv            | Currency  | Gross amount of loan approved by bank (lender)        |
 | SBA_Appv          | Currency  | SBA's guaranteed amount of approved loan              |
 
+The following actions are taken to transform the data:
+
+* __NAICS__ (North American Industry Classification System):  This is a 2- through 6-digit hierachical classfication system used by the Federal agencies to classify business establishments for the statiscial collection, analysis, ana presentation of data.  The first two digits of NAICS represents the economic sector.  Even though the original data contains the 6-digit code (despite many missing values), efforts are taken to reduce the code to the first two digits, therefore summarizing the loans to sector level.  The below table shows the description of the NAICS sectors, with more details found on the [U.S. Census page](https://www.census.gov/cgi-bin/sssd/naics/naicsrch?chart=2017)
+
+   | Sector | Description                                                              |
+   |--------|--------------------------------------------------------------------------|
+   | 11     | Agriculture, Forestry, Fishing and Hunting                               |
+   | 21     | Mining, Quarrying, and Oil and Gas Extraction                            |
+   | 22     | Utilities                                                                |
+   | 23     | Construction                                                             |
+   | 31-33  | Manufacturing                                                            |
+   | 42     | Wholesale Trade                                                          |
+   | 44-45  | Retail Trade                                                             |
+   | 48-49  | Transportation and Warehousing                                           |
+   | 51     | Information                                                              |
+   | 52     | Finance and Insurance                                                    |
+   | 53     | Real Estate and Rental and Leasing                                       |
+   | 54     | Professional, Scientific, and Technical Services                         |
+   | 55     | Management of Companies and Enterprises                                  |
+   | 56     | Administrative and Support and Waste Management and Remediation Services |
+   | 61     | Educational Services                                                     |
+   | 62     | Health Care and Social Assistance                                        |
+   | 71     | Arts, Entertainment, and Recreation                                      |
+   | 72     | Accommodation and Food Serivices                                         |
+   | 81     | Other Services (except Public Administration)                            |
+   | 92     | Public Administration                                                    |
+
+* __ApprovalFY__: In the original data set, there are 18 observations with ApprovalFY='1976A'.  I am not able to find what the 'A' indicates.  I choose to convert these values to 1976, thereby collapsing these 18 data points to be with ApprovalFY='1976'.
+
+* __Franchise__: The original data set has mixed entry for this variable.  Entries '0000' and '0001' indicate there is no franchise, and franchise codes are entered wherever franchises are involved.  I choose to convert this variable to a boolean type with 0 indicating no franchise and 1 otherwise. 
+
+* __NewExist__ (1=Existing Business, 2=New Business): I choose to convert this variable to a Boolean type variable __NewBiz__ with 0 indicating existing business and 1 new business. 
+
+* __LowDoc__ (Y=Yes, N=No): In order to 
 
 ## Models & Comparison <a name="model"></a>
 

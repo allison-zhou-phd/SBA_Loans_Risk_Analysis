@@ -53,8 +53,6 @@ def fix_Date_Year(df, col_1, col_2):
 if __name__ == "__main__":
     df = pd.read_csv('data/SBAnational.csv', parse_dates=['ApprovalDate','ApprovalFY'])
     df['Sector'] = [int(str(x)[:2]) for x in df['NAICS']]
-    # df_1976A = df[df['ApprovalFY']=='1976A']
-    # print(df_1976A.shape)
     df.loc[df['ApprovalFY']=='1976A','ApprovalFY']='1976'
     df['ApprovalFY'] = df['ApprovalFY'].astype(int)
     df['NewBiz'] = df['NewExist'].map({0:1, 1:0, 2:1})
