@@ -9,11 +9,10 @@ def pd_columnToNumber(df,col_name):
 
 def stringToNumber(s):
     """
-    Convert number in accounting format from string to float
+    Convert number in accounting format from string to float.
 
     Args:
     s: number as string in accounting format
-
     Returns:
     float number
     """
@@ -28,7 +27,9 @@ def stringToNumber(s):
     return float(s)
 
 def fix_Date_Year(df, col_1, col_2):
-    """Some approval dates are imported as incorrect year (e.g. 2069 instead of 1969).  This function fixes it.
+    """
+    Some approval dates are imported as incorrect year (e.g. 2069 instead of 1969).  This function fixes it.
+
     Args:
         df:     the dataframe 
         col_1:  the col that contains the incorrect date
@@ -63,4 +64,16 @@ if __name__ == "__main__":
                   'CreateJob','RetainedJob','Franchise','UrbanRural','LowDocu','DisburseDate','DisburseGross','GrAppv','SBA_Appv','Default']]
     df_loan = fix_Date_Year(df_loan, 'ApprovalDate', 'ApprovalFY')
     df_loan = df_loan.dropna()
-    df_loan.to_pickle('data/pickled_loan')   
+
+    # read in the monthly unemployment data and merge with the the loan data on the same year/month
+    us_unemploy = pd.read_csv('data/us_unemployment.csv', index_col=0)
+    ur = us_unemploy.values.reshape(-1,1)[:-8]
+    date_range = pd.date_range('1965-01','2020-05', freq='M')
+    df_ur = pd.DataFrame(data=ur, index=date_range, columns=['U_rate'])
+    df_ur['Date'] = df_ur.index
+
+    df_new = pd.merge(df_loan.assign(grouper=df_loan['ApprovalDate'].dt.to_period('M')),
+                      df_ur.assign(grouper=df_ur['Date'].dt.to_period('M')),
+                      how='left', on='grouper')
+    df_new.drop(['grouper','Date'], axis=1)
+    df_new.to_pickle('data/pickled_loan')   
