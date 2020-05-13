@@ -75,5 +75,5 @@ if __name__ == "__main__":
     df_new = pd.merge(df_loan.assign(grouper=df_loan['ApprovalDate'].dt.to_period('M')),
                       df_ur.assign(grouper=df_ur['Date'].dt.to_period('M')),
                       how='left', on='grouper')
-    df_new.drop(['grouper','Date'], axis=1)
+    df_new.drop(['grouper','Date'], axis=1, inplace=True)
     df_new.to_pickle('data/pickled_loan')   
