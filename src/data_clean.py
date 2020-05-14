@@ -69,6 +69,7 @@ if __name__ == "__main__":
     us_unemploy = pd.read_csv('data/us_unemployment.csv', index_col=0)
     ur = us_unemploy.values.reshape(-1,1)[:-8]
     date_range = pd.date_range('1965-01','2020-05', freq='M')
+
     df_ur = pd.DataFrame(data=ur, index=date_range, columns=['U_rate'])
     df_ur['Date'] = df_ur.index
 

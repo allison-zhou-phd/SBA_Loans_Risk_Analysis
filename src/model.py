@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 plt.rcParams.update({'font.size': 10})
+from time import time
 
 from sklearn.preprocessing import StandardScaler 
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -81,9 +82,50 @@ def print_model_metrics(model, X_train, X_test, y_train, y_test):
     print("{} Precision (test):".format(name), precision_score(y_test, y_pred))
     print("{} Recall (test):".format(name), recall_score(y_test, y_pred))
 
+def plot_feature_importance(model, X, col_names):
+    importances = model.feature_importances_
+    #std = np.std([tree.feature_importances_ for tree in model.estimators_], axis=0)
+    indices = np.argsort(importances)[::-1]
+    name = model.__class__.__name__.replace('Classifier','')
+    # plt.bar(range(X.shape[1]), importances[indices],
+    #     color="r", yerr=std[indices], align="center")
+    plt.bar(range(X.shape[1]), importances[indices], color="r")
+    plt.title("{} Feature importances".format(name))
+    plt.xlabel("Feature number")
+    plt.ylabel("Feature importance")
+    plt.xticks(range(X.shape[1]), col_names[indices], rotation=45, fontsize=8, ha='right')
+
+    plt.xlim([-1, X.shape[1]])
+
+def gridsearch_with_output(estimator, parameter_grid, X_train, y_train):
+    '''
+        Parameters: estimator: the type of model (e.g. RandomForestRegressor())
+                    paramter_grid: dictionary defining the gridsearch parameters
+                    X_train: 2d numpy array
+                    y_train: 1d numpy array
+
+        Returns:  best parameters and model fit with those parameters
+    '''
+    model_gridsearch = GridSearchCV(estimator,
+                                    parameter_grid,
+                                    n_jobs=-1,
+                                    verbose=True)
+    model_gridsearch.fit(X_train, y_train)
+    best_params = model_gridsearch.best_params_ 
+    model_best = model_gridsearch.best_estimator_
+    print("\nResult of gridsearch:")
+    print("{0:<20s} | {1:<8s} | {2}".format("Parameter", "Optimal", "Gridsearch values"))
+    print("-" * 55)
+    for param, vals in parameter_grid.items():
+        print("{0:<20s} | {1:<8s} | {2}".format(str(param), 
+                                                str(best_params[param]),
+                                                str(vals)))
+    return best_params, model_best
+
 def load_split_data():
     df_loan = pd.read_pickle('data/loan_data')
-    df_loan = pd.read_pickle('data/loan_data')
+    feature_choice = ['Term', 'U_rate', 'SBA_g', 'GrAppv', 'SectorRisk', 'Default']
+    df_loan = df_loan[feature_choice]
     y = df_loan.pop('Default').values
     X = df_loan.values
     col_names = df_loan.columns
@@ -96,7 +138,7 @@ if __name__ == "__main__":
     (X_model, X_holdout, y_model, y_holdout), col_names = load_split_data()
 
     ### Rely on class_weight option to balance the data
-    X_train, X_test, y_train, y_test = train_test_split(X_model, y_model, test_size=0.2, random_state=42, stratify=y_model)
+    # X_train, X_test, y_train, y_test = train_test_split(X_model, y_model, test_size=0.2, random_state=42, stratify=y_model)
 
     # # Naive Bayes Model
     # # nb_model = MultinomialNB(alpha=1.0, fit_prior=True, class_prior=None)
@@ -123,4 +165,45 @@ if __name__ == "__main__":
     ### Rely on the undersample method to balance the data
     target_ratio = 0.45
     X_sampled, y_sampled = undersample(X_model, y_model, target_ratio)
+    X_train, X_test, y_train, y_test = train_test_split(X_sampled, y_sampled, test_size=0.2, random_state=42, stratify=y_sampled)
 
+    # Logistic Model
+    # lg_model = LogisticRegression(solver='lbfgs')
+    # print_model_metrics(lg_model, X_train, X_test, y_train, y_test)
+
+    # Randome Forest model
+    # rfc = RandomForestClassifier(n_estimators=300, n_jobs=-1, random_state=2,)
+    # print_model_metrics(rfc, X_train, X_test, y_train, y_test)
+    # plot_feature_importance(rfc, X_sampled, col_names)
+    # plt.savefig('images/rfc_feature_importances.png')
+    # plt.close()
+
+    # Gradient Descend Boost model 
+    # gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=300, random_state=2,
+    #                                 min_samples_leaf=200, max_depth=3, max_features=3)
+    # print_model_metrics(gbc, X_train, X_test, y_train, y_test)
+    # plot_feature_importance(gbc, X_sampled, col_names)
+    # plt.savefig('images/gbc_feature_importances.png')
+    # plt.close()
+
+    # AdaBoost Model
+    # abc = GradientBoostingClassifier(learning_rate=0.2, loss='exponential', n_estimators=300, random_state=2,
+    #                                 min_samples_leaf=200, max_depth=3, max_features=3)
+    # print_model_metrics(abc, X_train, X_test, y_train, y_test)
+
+    ## Reduce model to 5 variables: Term, U_rate, SBA_g, GrAppv, Sector_Risk
+    ## Conduct gridSearch to find the best fitting gbc model
+
+    gradient_boosting_grid = {'learning_rate': [0.2, 0.1, 0.05],
+                              'max_depth': [3, 5],
+                              'min_samples_leaf': [50, 200],
+                              'max_features': [2, 3],
+                              'n_estimators': [300, 500],
+                              'random_state': [2]}
+    ts = time()
+    gdbr_best_params, gdbr_best_model = gridsearch_with_output(GradientBoostingClassifier(), 
+                                                               gradient_boosting_grid, 
+                                                               X_train, y_train)
+    te= time()
+    print("Time passed:", te-ts)
+    
