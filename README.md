@@ -4,7 +4,12 @@
 1. [Background & Motivation](#background)
 2. [Data](#data)
 3. [Data EDA](#eda)
-4. [Models](#model)
+   1. [Location(State)](#state)
+   2. [Sector](#sector)
+   3. [Bank(Lender)](#bank)
+   4. [Business Characteristics](#business)
+   5. [Loan Characteristics](#loan)
+4. [Sampling, Models & Comparison](#model)
 5. [Results](#result)
 
 
@@ -100,19 +105,19 @@ The following actions are taken to transform the data:
 
 Which explanatory variables may be good predicators of whether a loan will go into default or not?  This section uses data exploratory analysis to investigate and gather useful features for the predicative model.  
 
-### 3.1. Location (State)
+### 3.1. Location (State) <a name="state"></a>
 
 Location (in this case State) can be a possible indicator for potential loan risk.  The 50 states and Washington DC have different economic environments and industry concentration, therefore leading to different default rates.  As shown by the heat map below, loan default rates definitely vary across states with Florida leading the pack at around 27.4%.  This could be explained by Florida suffering more from the boom and bust of real estate cycles, as well as more natural disaters like typhoons.  In contrast, western states like Montana and Wyoming have lower loan default rates (in the 6% range).  This could be because these states traditionally relies on the oil and mineral industries which were more or less stable during the sample periods.     
 
 ![](images/default_state.png)
 
-### 3.2. Sectors
+### 3.2. Sector <a name="sector"></a>
 
 The below bar charts shows the top 10 highest loan default sectors.  Cross-referencing the sector NAICS table above, we can see that __sector 53__ is "Real estate and rental and leasing".  Real estate secotor is pro-cyclical and tends to overshoot in both economic booms and busts.  Since 1980, the United States has experienced at least two big real-estate led economic cycles, the most recent being the 2008-2009 financial crisis.  On the other of the spectrum, __sector 11__ (Agriculture, forestry, fishing and hunting), __sector 21__ (Mining, quarring, and oil and gas extraction), __sector 55__ (Management), and __sector 62__ (Health care and social assistance) suffer from lower loan default risks (in the 10% range) either because the sector is acyclical or hasn't experienced significant downward price adjustments.  (The same cannot be said about oil and gas industry in the Covid-19 Crisis, though the cause is not the virus alone.) 
 
 ![](images/default_sector.png)
 
-### 3.3. Bank (Lender)
+### 3.3. Bank (Lender) <a name="bank"></a>
 
 Banking is an industry with high regulations.  Typically commercial banks have long established guidance to assess loan risks.  Therefore we wouldn't expect the commercial bank or which state the bank reside in has any impact on the loan default rates, unless the bank is not following the regulatory rules.  Since there are many banking/credit union entities in the data set, most of issue less than 1000 loans.  I choose to plot two histograms of all banks extending 1000+ or 3000+ loans, see below charts.  As expected, we can't make the association that banks with more loans issued have lower / higher default rates.   
 
@@ -120,7 +125,7 @@ Banking is an industry with high regulations.  Typically commercial banks have l
 
 ![](images/default_bank_1000.png)
 
-### 3.4. Business Characteristics
+### 3.4. Business Characteristics <a name="business"></a>
 
 SBA dataset contains some business characteristics that might be influential in the performance of loans.  Specifically, 
 * New business? - the assumption is established business have a proven record of success with established customers, operation workflow, etc.  In contrast new businesses unproven and might not weather economic ups and downs as well.  However, calculated data indicates otherwise:
@@ -145,7 +150,7 @@ SBA dataset contains some business characteristics that might be influential in 
 | 25% quartile |       2 |           2 |
 | Minimum      |       0 |           0 |
 
-### 3.5. Loan Characteristics
+### 3.5. Loan Characteristics <a name="loan"></a>
 
 Other variables relate more to the loan characteristics. Below are some comparisons of the quantiles for loans ending in default v.s. non-default. 
 
@@ -195,7 +200,7 @@ With the initial data EDA, I made the choice to select the following variables t
 
 For StateRisk and SectorRisk, additional bucketing is done to convert the variables into numeric values.  For StateRisk, any state with a default rate higher than 18%(inclusive) is categorized as high risk (value=2). States with default rate between 10% and 18%(not inclusive) are rated 1 and those with default rate lower than 10% are rated 0.  For SectorRisk, ratings are similarly chosen amongst 0, 1, and 2, with the cutoff levels at default rate equal to 10% or 20%. 
 
-## Models & Comparison <a name="model"></a>
+## 4. Sampling, Models & Comparison <a name="model"></a>
 
 
-## Results <a name="result"></a>
+## 5. Results <a name="result"></a>
