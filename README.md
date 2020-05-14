@@ -135,7 +135,7 @@ SBA dataset contains some business characteristics that might be influential in 
 |--------------|----------:|--------------:|
 | Default Rate |    15.16% |        17.68% |
 
-* Number of Employees - below is a quartile table. It seems that Non-default loans have more employees.  Maybe bigger in size? 
+* Number of Employees? - below is a quartile table. It seems that Non-default loans have more employees.  Perhaps bigger in size? 
 
 | Quartiles    | Default | Non-Default |
 |--------------|--------:|------------:|
@@ -181,10 +181,21 @@ __Default_by_LowDocu__
 |--------------|----------:|--------------:|
 | Default Rate |    9.00%  |        18.74% |
 
-Based on these numbers, we can draw initial conclusions that loans with higher gross disbursement dollar amounts, with longer loan terms and higher SBA guarantee ratios tend to have lower default risk.  This could be explained by that businesses getting these type of loans are more established, bigger in operations, or have other collaterals posted(e.g. real estates).
+Based on these numbers, we can draw initial conclusions that loans with higher gross disbursement dollar amounts, with longer loan terms and higher SBA guarantee ratios tend to have lower default risk.  This could be explained by that businesses getting these types of loans are more established, bigger in operation sizes, or have other collaterals posted(e.g. real estates).
 
-With these initial data EDA, I made the choice to select the following variables for modeling loan default risk: StateRisk, SectorRisk, LoanTerm(Term), Number of Employees(NumEmp), LowDocu, Gross_Approval_Amt(GrAppv), SBA_Guaranteed_Ratio(SBA_g), Unemployment(U_rate). 
+With the initial data EDA, I made the choice to select the following variables to model loan default risk: 
+* StateRisk
+* SectorRisk
+* LoanTerm(Term)
+* Number of Employees(NumEmp)
+* LowDocu
+* Gross_Approval_Amt(GrAppv)
+* SBA_Guaranteed_Ratio(SBA_g)
+* Unemployment(U_rate)  
+
+For StateRisk and SectorRisk, additional bucketing is done to convert the variables into numeric values.  For StateRisk, any state with a default rate higher than 18%(inclusive) is categorized as high risk (value=2). States with default rate between 10% and 18%(not inclusive) are rated 1 and those with default rate lower than 10% are rated 0.  For SectorRisk, ratings are similarly chosen amongst 0, 1, and 2, with the cutoff levels at default rate equal to 10% or 20%. 
 
 ## Models & Comparison <a name="model"></a>
+
 
 ## Results <a name="result"></a>
