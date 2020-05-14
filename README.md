@@ -9,7 +9,9 @@
    3. [Bank(Lender)](#bank)
    4. [Business Characteristics](#business)
    5. [Loan Characteristics](#loan)
-4. [Sampling, Models & Comparison](#model)
+4. [Sampling, Modeling & Comparison](#model)
+   1. [Sampling](#sample)
+   2. [Model & Comparison](#compare)
 5. [Results](#result)
 
 
@@ -200,7 +202,41 @@ With the initial data EDA, I made the choice to select the following variables t
 
 For StateRisk and SectorRisk, additional bucketing is done to convert the variables into numeric values.  For StateRisk, any state with a default rate higher than 18%(inclusive) is categorized as high risk (value=2). States with default rate between 10% and 18%(not inclusive) are rated 1 and those with default rate lower than 10% are rated 0.  For SectorRisk, ratings are similarly chosen amongst 0, 1, and 2, with the cutoff levels at default rate equal to 10% or 20%. 
 
-## 4. Sampling, Models & Comparison <a name="model"></a>
+## 4. Sampling, Modeling & Comparison <a name="model"></a>
 
+The ultimate goal of this study is to have a model that has good predictive power in loan defaults.  Various models are tried and this section details the steps taken and the performance comparison of various models.  
+
+### 4.1. Sampling <a name="sample"></a>
+
+Before hopping into the modeling topic, there is one last decison about the feature dataset to make.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has 9 attributes with the 9th being the loan defaulted or not.  The rest 8 attributes are the potential explanatory variables. A deeper look at the data reveals that the classes are not balanced.  The minority class (which is also the event we try to identify) takes about 20% of the 887,382 observations.  
+
+To solve the imbalanced classes problem, two options are considered in the study:
+
+* Use the "class_weight" option that is built in some of the SKlearn models.  Setting this option to "balanced" results in an automatic weights adjustment by the inverse of class frequencies. 
+
+* Perform resampling to balance the dataset before feeding the data to models.  Because I have enough data points for both the minority and majority classes.  I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class.  
+
+Both of these options are tried on four types of models: Logistic Regression, Random Forest, Gradient Boosted Classifier, and AdaBoost Classifier.  The resulting model metrics on the test data are listed in the below table.  All models are run on the selected 8 explanatory variables.  
+
+| Models              | Class_weight | Undersample |
+|---------------------|-------------:|------------:|
+| __Logistic Regression__ |              |             |
+|    Precision        |        0.367 |       0.687 |
+|    Recall           |        0.071 |       0.054 |
+|    Accuracy         |        0.816 |       0.564 |
+| __Random Forest__       |              |             |
+|    Precision        |        0.836 |       0.895 |
+|    Recall           |        0.746 |       0.879 |
+|    Accuracy         |        0.930 |       0.899 |
+| __Gradient Boost__      |              |             |
+|    Precision        |        0.847 |       0.898 |
+|    Recall           |        0.771 |       0.879 |
+|    Accuracy         |        0.935 |       0.899 |
+| __Ada Boost__           |              |             |
+|    Precision        |        0.848 |       0.895 |
+|    Recall           |        0.763 |       0.900 |
+|    Accuracy         |        0.934 |       0.908 |
+
+### 4.2. Modeling & Comparison <a name="compare"></a>
 
 ## 5. Results <a name="result"></a>
