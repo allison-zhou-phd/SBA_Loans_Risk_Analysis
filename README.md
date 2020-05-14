@@ -90,6 +90,8 @@ The following actions are taken to transform the data:
 
 * __Currency_Variables__:  The original data variables with type = 'Currency' are formated in the accounting convention with "$" and "," separators. These are converted to the float data type. 
 
+* __SBA Guaranteed Portion__:  The original dataset contains the gross loan amount and the SBA guaranteed amount.  I choose to divide the latter by the former to obtain a new variable __SBA_g__ which is the percent of loan that is guanranteed by SBA.  It is a variable with values between 0 and 1.
+
 * __U.S. Unemployment Rate__:  The final variable which isn't contained in the original SBA loan dataset is the U.S. unemployment rate, a monthly data series obtained from from the U.S. [Bureau of Labor Statistics](https://data.bls.gov/timeseries/LNS14000000). It is introduced as a proxy for where the U.S. economy stands during an economic cycle.  The unemployment rate data is merged with the SBA loan data on the loan approval date.  The thought behind this is loans issued during bad economic times (with high unemployment rate) can have higher default risk and vice versa. Below is a plot of the unemployment rate during 1965.01 to 2020.04.  Admittedly our SBA loan data ends roughly at mid 2014.
 
 ![](images/unemployment.png)
@@ -110,7 +112,7 @@ The below bar charts shows the top 10 highest loan default sectors.  Cross-refer
 
 ![](images/default_sector.png)
 
-### 3.3. Bank (lender)
+### 3.3. Bank (Lender)
 
 Banking is an industry with high regulations.  Typically commercial banks have long established guidance to assess loan risks.  Therefore we wouldn't expect the commercial bank or which state the bank reside in has any impact on the loan default rates, unless the bank is not following the regulatory rules.  Since there are many banking/credit union entities in the data set, most of issue less than 1000 loans.  I choose to plot two histograms of all banks extending 1000+ or 3000+ loans, see below charts.  As expected, we can't make the association that banks with more loans issued have lower / higher default rates.   
 
@@ -118,6 +120,70 @@ Banking is an industry with high regulations.  Typically commercial banks have l
 
 ![](images/default_bank_1000.png)
 
+### 3.4. Business Characteristics
+
+SBA dataset contains some business characteristics that might be influential in the performance of loans.  Specifically, 
+* New business? - the assumption is established business have a proven record of success with established customers, operation workflow, etc.  In contrast new businesses unproven and might not weather economic ups and downs as well.  However, calculated data indicates otherwise:
+
+|              | New Biz | Established Biz |
+|--------------|--------:|----------------:|
+| Default Rate |  18.60% |          17.11% |
+
+* Franchised? - similar to the new business, one can argue that business with a franchised model might have a lower risk to default on loans.  This is because franchised businesses tend to have established business plans, target clientiles, smoothed supply chains, etc.  Yet the calculated data indicates otherwise:
+
+|              | Franchise | Non-Franchise |
+|--------------|----------:|--------------:|
+| Default Rate |    15.16% |        17.68% |
+
+* Number of Employees - below is a quartile table. It seems that Non-default loans have more employees.  Maybe bigger in size? 
+
+| Quartiles    | Default | Non-Default |
+|--------------|--------:|------------:|
+| 100% maximum |    9999 |        9999 |
+| 75% quartile |       7 |          11 |
+| 50% median   |       3 |           5 |
+| 25% quartile |       2 |           2 |
+| Minimum      |       0 |           0 |
+
+### 3.5. Loan Characteristics
+
+Other variables relate more to the loan characteristics. Below are some comparisons of the quantiles for loans ending in default v.s. non-default. 
+
+__Loan Gross Disbursement__
+| Quartiles    |    Default | Non-Default |
+|--------------|-----------:|------------:|
+| 100% maximum | $4,362,157 | $11,446,325 |
+| 75% quartile |   $140,417 |    $256,686 |
+| 50% median   |    $62,000 |    $100,000 |
+| 25% quartile |    $28,055 |     $49,000 |
+| Minimum      |     $4,000 |      $4,000 |
+
+__Loan Term (months)__
+| Quartiles    | Default | Non-Default |
+|--------------|--------:|------------:|
+| 100% maximum |     461 | $11,446,325 |
+| 75% quartile |      68 |         180 |
+| 50% median   |      49 |          84 |
+| 25% quartile |      29 |          78 |
+| Minimum      |       0 |           0 |
+
+__SBA Guarantee Portion (%)__
+| Quartiles    | Default | Non-Default |
+|--------------|--------:|------------:|
+| 100% maximum |     100 |         100 |
+| 75% quartile |      82 |          85 |
+| 50% median   |      50 |          75 |
+| 25% quartile |      50 |          50 |
+| Minimum      |      12 |         2.8 |
+
+__Default_by_LowDocu__
+|              | LowDocu   | Non-LowDocu   |
+|--------------|----------:|--------------:|
+| Default Rate |    9.00%  |        18.74% |
+
+Based on these numbers, we can draw initial conclusions that loans with higher gross disbursement dollar amounts, with longer loan terms and higher SBA guarantee ratios tend to have lower default risk.  This could be explained by that businesses getting these type of loans are more established, bigger in operations, or have other collaterals posted(e.g. real estates).
+
+With these initial data EDA, I made the choice to select the following variables for modeling loan default risk: StateRisk, SectorRisk, LoanTerm(Term), Number of Employees(NumEmp), LowDocu, Gross_Approval_Amt(GrAppv), SBA_Guaranteed_Ratio(SBA_g), Unemployment(U_rate). 
 
 ## Models & Comparison <a name="model"></a>
 
