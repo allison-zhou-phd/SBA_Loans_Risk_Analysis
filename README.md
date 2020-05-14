@@ -208,7 +208,7 @@ The ultimate goal of this study is to have a model that has good predictive powe
 
 ### 4.1. Sampling <a name="sample"></a>
 
-Before hopping into the modeling topic, there is one last decison about the feature dataset to make.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has 9 attributes with the 9th being the loan defaulted or not.  The rest 8 attributes are the potential explanatory variables. A deeper look at the data reveals that the classes are not balanced.  The minority class (which is also the event we try to identify) takes about 20% of the 887,382 observations.  
+Before hopping into the modeling topic, there is one last decison about the dataset to make.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has 9 attributes with the 9th being the loan defaulted or not.  The rest 8 attributes are the potential explanatory variables. A deeper look at the data reveals that the classes are not balanced.  The minority class (which is also the event we try to identify) takes about 20% of the 887,382 observations.  
 
 To solve the imbalanced classes problem, two options are considered in the study:
 
@@ -237,6 +237,22 @@ Both of these options are tried on four types of models: Logistic Regression, Ra
 |    Recall           |        0.763 |       0.900 |
 |    Accuracy         |        0.934 |       0.908 |
 
+Comparing the model performance metrics between the two sampling options, it is easy to see that the Undersample method does matter in the great majority of cases.  Therefore this option is chosen.  Amongst the model selections, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boost to identify features of importance.   
+
 ### 4.2. Modeling & Comparison <a name="compare"></a>
+
+With the resampled data and original 8 features, a Random Forest model and a Gradient Boost model are fitted separately.  The goal is see if both models will identify the same set of important features
+
+* Random Forest Model - as the below chart indicates, the most imoportant feature in predicting loan default risk is loan term ('Term'), explaining about 58% of the information gain.  This is followed by gross loan amount ('GrAppv'), the unemployment rate ('U_rate'), number of employees(NumEmp), SBA guaranteed percent('SBA_g'). 
+
+![](images/rfc_feature_importances.png)
+
+* Gradient Boost Model - Like the Random Forest model, the most important feature is 'Term', explaining almost 76% of the information gain.  In a decreasing order, the next four important features are 'U_rate', 'GrAppv', 'SBA_g', and 'SectorRisk'.  There is actually a very good overlap between the two models. Four out of the five most important features are the same.  
+
+![](images/gbc_feature_importances.png)
+
+The below chart shows the partial dependence plot on the first five important features for the Gradient Boost model. 
+
+![](images/gbc_partDepend.png)
 
 ## 5. Results <a name="result"></a>

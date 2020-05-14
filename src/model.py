@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
-plt.rcParams.update({'font.size': 10})
+plt.rcParams.update({'font.size': 12})
 from time import time
 
 from sklearn.preprocessing import StandardScaler 
@@ -11,6 +11,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.inspection import plot_partial_dependence
 #from sklearn.externals import joblib
 
 # class DefaultModeler(object):
@@ -84,18 +85,15 @@ def print_model_metrics(model, X_train, X_test, y_train, y_test):
 
 def plot_feature_importance(model, X, col_names):
     importances = model.feature_importances_
-    #std = np.std([tree.feature_importances_ for tree in model.estimators_], axis=0)
     indices = np.argsort(importances)[::-1]
     name = model.__class__.__name__.replace('Classifier','')
-    # plt.bar(range(X.shape[1]), importances[indices],
-    #     color="r", yerr=std[indices], align="center")
     plt.bar(range(X.shape[1]), importances[indices], color="r")
     plt.title("{} Feature importances".format(name))
-    plt.xlabel("Feature number")
+    plt.xlabel("Feature")
     plt.ylabel("Feature importance")
-    plt.xticks(range(X.shape[1]), col_names[indices], rotation=45, fontsize=8, ha='right')
-
+    plt.xticks(range(X.shape[1]), col_names[indices], rotation=45, fontsize=12, ha='right')
     plt.xlim([-1, X.shape[1]])
+    plt.tight_layout()
 
 def gridsearch_with_output(estimator, parameter_grid, X_train, y_train):
     '''
@@ -124,8 +122,8 @@ def gridsearch_with_output(estimator, parameter_grid, X_train, y_train):
 
 def load_split_data():
     df_loan = pd.read_pickle('data/loan_data')
-    feature_choice = ['Term', 'U_rate', 'SBA_g', 'GrAppv', 'SectorRisk', 'Default']
-    df_loan = df_loan[feature_choice]
+    # feature_choice = ['Term', 'U_rate', 'SBA_g', 'GrAppv', 'SectorRisk', 'Default']
+    # df_loan = df_loan[feature_choice]
     y = df_loan.pop('Default').values
     X = df_loan.values
     col_names = df_loan.columns
@@ -134,30 +132,30 @@ def load_split_data():
 
 if __name__ == "__main__":
 
-    # X_model and y_model to be used in training the model, the holdout sets for model evaluation
+    ### X_model and y_model to be used in training the model, the holdout sets for final model evaluation
     (X_model, X_holdout, y_model, y_holdout), col_names = load_split_data()
 
     ### Rely on class_weight option to balance the data
     # X_train, X_test, y_train, y_test = train_test_split(X_model, y_model, test_size=0.2, random_state=42, stratify=y_model)
 
-    # # Naive Bayes Model
+    # ### Naive Bayes Model
     # # nb_model = MultinomialNB(alpha=1.0, fit_prior=True, class_prior=None)
     # # print_model_metrics(nb_model, X_train, X_test, y_train, y_test)
 
-    # # Logistic Model
+    # ### Logistic Model
     # lg_model = LogisticRegression(solver='lbfgs', class_weight='balanced')
     # print_model_metrics(lg_model, X_train, X_test, y_train, y_test)
 
-    # # Randome Forest model
+    # ### Randome Forest model
     # rfc = RandomForestClassifier(n_estimators=300, n_jobs=-1, random_state=2, class_weight='balanced')
     # print_model_metrics(rfc, X_train, X_test, y_train, y_test)
 
-    # # Gradient Descend Boost model 
+    # ### Gradient Descend Boost model 
     # gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=300, random_state=2,
     #                                 min_samples_leaf=200, max_depth=3, max_features=3)
     # print_model_metrics(gbc, X_train, X_test, y_train, y_test)
     
-    # # AdaBoost Model
+    # ### AdaBoost Model
     # abc = GradientBoostingClassifier(learning_rate=0.2, loss='exponential', n_estimators=300, random_state=2,
     #                                 min_samples_leaf=200, max_depth=3, max_features=3)
     # print_model_metrics(abc, X_train, X_test, y_train, y_test)
@@ -171,17 +169,35 @@ if __name__ == "__main__":
     # lg_model = LogisticRegression(solver='lbfgs')
     # print_model_metrics(lg_model, X_train, X_test, y_train, y_test)
 
-    # Randome Forest model
-    # rfc = RandomForestClassifier(n_estimators=300, n_jobs=-1, random_state=2,)
-    # print_model_metrics(rfc, X_train, X_test, y_train, y_test)
+    ### Randome Forest model - feature importance
+    rfc = RandomForestClassifier(n_estimators=300, n_jobs=-1, random_state=2,)
+    print_model_metrics(rfc, X_train, X_test, y_train, y_test)
+    names = ['StateRisk', 'SectorRisk','Term', 'NumEmp', 'LowDocu', 'GrAppv', 'SBA_g','U_rate']
+    """Below code would hang when running. No error msg.  Need to investigate
+    # features = [2, 5, 7, 3, 6]
+    # plot_partial_dependence(rfc, X_train, features=features, feature_names=names) 
+    # fig = plt.gcf()
+    # fig.set_size_inches(11,8)
+    # plt.tight_layout()
+    # plt.savefig('images/rf_partDepend.png')
+    # plt.close()
+    """
     # plot_feature_importance(rfc, X_sampled, col_names)
     # plt.savefig('images/rfc_feature_importances.png')
     # plt.close()
 
-    # Gradient Descend Boost model 
-    # gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=300, random_state=2,
-    #                                 min_samples_leaf=200, max_depth=3, max_features=3)
-    # print_model_metrics(gbc, X_train, X_test, y_train, y_test)
+
+    ### Gradient Boost model - feature importance
+    gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=300, random_state=2,
+                                    min_samples_leaf=200, max_depth=3, max_features=3)
+    print_model_metrics(gbc, X_train, X_test, y_train, y_test)
+    features = [2, 7, 5, 6, 1]
+    plot_partial_dependence(gbc, X_train, features=features, feature_names=names) 
+    fig = plt.gcf()
+    fig.set_size_inches(11,8)
+    plt.tight_layout()
+    plt.savefig('images/gbc_partDepend.png')
+    plt.close()
     # plot_feature_importance(gbc, X_sampled, col_names)
     # plt.savefig('images/gbc_feature_importances.png')
     # plt.close()
@@ -194,16 +210,16 @@ if __name__ == "__main__":
     ## Reduce model to 5 variables: Term, U_rate, SBA_g, GrAppv, Sector_Risk
     ## Conduct gridSearch to find the best fitting gbc model
 
-    gradient_boosting_grid = {'learning_rate': [0.2, 0.1, 0.05],
-                              'max_depth': [3, 5],
-                              'min_samples_leaf': [50, 200],
-                              'max_features': [2, 3],
-                              'n_estimators': [300, 500],
-                              'random_state': [2]}
-    ts = time()
-    gdbr_best_params, gdbr_best_model = gridsearch_with_output(GradientBoostingClassifier(), 
-                                                               gradient_boosting_grid, 
-                                                               X_train, y_train)
-    te= time()
-    print("Time passed:", te-ts)
+    # gradient_boosting_grid = {'learning_rate': [0.2, 0.1, 0.05],
+    #                           'max_depth': [3, 5],
+    #                           'min_samples_leaf': [50, 200],
+    #                           'max_features': [2, 3],
+    #                           'n_estimators': [300, 500],
+    #                           'random_state': [2]}
+    # ts = time()
+    # gdbr_best_params, gdbr_best_model = gridsearch_with_output(GradientBoostingClassifier(), 
+    #                                                            gradient_boosting_grid, 
+    #                                                            X_train, y_train)
+    # te= time()
+    # print("Time passed:", te-ts)
     
