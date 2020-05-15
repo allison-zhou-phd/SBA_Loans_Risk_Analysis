@@ -288,4 +288,4 @@ Signs on variables 'Term' and 'SectorRisk' are as expected.  Longer loan terms t
 
 ## 5. Conclusion <a name="result"></a>
 
-The loan default classifier was trained on the undersampled training dataset of ~277,000 loans and tested on the holdout test set of ~177,500.  The model performance has been satisfactory with 92.1% overall accuracy.  Precision rate dropped from the 90% range in the training/test set to 71.5%.  I realized at the end of day that I should have resampled the overall dataset first before taking the holdout set.  This will be done in the next round of model iteration. 
+The loan default classifier was trained on the undersampled training dataset of ~277,000 loans and tested on the holdout test set of ~177,500.  The model performance has been satisfactory with 92.1% overall accuracy.  Precision rate dropped from the 90% range in the training/test set to 71.5%.  I realized at the end of day that I should have resampled the overall dataset first before taking the holdout set.  This will be done in the next round of model iteration.  Additionally I would like to try other ML models on this dataset such as the multi-level perceptron (MLP).
