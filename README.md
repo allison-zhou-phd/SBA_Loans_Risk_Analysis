@@ -11,8 +11,9 @@
    5. [Loan Characteristics](#loan)
 4. [Sampling, Modeling & Comparison](#model)
    1. [Sampling](#sample)
-   2. [Model & Comparison](#compare)
-5. [Results](#result)
+   2. [Modeling & Comparison](#compare)
+   3. [Final Model](#final)
+5. [Conclusion](#result)
 
 
 ## 1. Background & Motivation <a name="background"></a>
@@ -214,7 +215,7 @@ To solve the imbalanced classes problem, two options are considered in the study
 
 * Use the "class_weight" option that is built in some of the SKlearn models.  Setting this option to "balanced" results in an automatic weights adjustment by the inverse of class frequencies. 
 
-* Perform resampling to balance the dataset before feeding the data to models.  Because I have enough data points for both the minority and majority classes.  I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class.  
+* Perform resampling to balance the dataset before feeding the data to models.  Because I have enough data points for both the minority and majority classes.  I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class. After undersampling is done, I have a dataset of 276,579 observations. 
 
 Both of these options are tried on four types of models: Logistic Regression, Random Forest, Gradient Boosted Classifier, and AdaBoost Classifier.  The resulting model metrics on the test data are listed in the below table.  All models are run on the selected 8 explanatory variables.  
 
@@ -255,4 +256,19 @@ The below chart shows the partial dependence plot on the first five important fe
 
 ![](images/gbc_partDepend.png)
 
-## 5. Results <a name="result"></a>
+Given the feature importance study, I made a decison to further reduce the number of explanatory to five: 'Term', 'U_rate', 'GrAppv', 'SBA_g', and 'SectorRisk' and proceed with the Gradient Boost model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
+
+| Parameter        | Optimal | Gridsearch Values |
+|------------------|--------:|------------------:|
+| learning rate    |     0.2 |  [0.2, 0.1, 0.05] |
+| max_depth        |       5 |            [3, 5] |
+| min_samples_leaf |      50 |         [50, 200] |
+| max_features     |       3 |             [2,3] |
+| n_estimators     |     500 |        [500, 300] |
+| random_state     |       2 |                 2 |
+
+A final model with the optimal hyper-parameters and five explanatory variables are fit on the entire train dataset. 
+
+### 4.3. Final Model <a name="final"></a>
+
+## 5. Conclusion <a name="result"></a>

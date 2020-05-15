@@ -87,7 +87,7 @@ def plot_feature_importance(model, X, col_names):
     importances = model.feature_importances_
     indices = np.argsort(importances)[::-1]
     name = model.__class__.__name__.replace('Classifier','')
-    plt.bar(range(X.shape[1]), importances[indices], color="r")
+    plt.bar(range(X.shape[1]), importances[indices], color="b")
     plt.title("{} Feature importances".format(name))
     plt.xlabel("Feature")
     plt.ylabel("Feature importance")
@@ -122,8 +122,8 @@ def gridsearch_with_output(estimator, parameter_grid, X_train, y_train):
 
 def load_split_data():
     df_loan = pd.read_pickle('data/loan_data')
-    # feature_choice = ['Term', 'U_rate', 'SBA_g', 'GrAppv', 'SectorRisk', 'Default']
-    # df_loan = df_loan[feature_choice]
+    feature_choice = ['Term', 'U_rate', 'SBA_g', 'GrAppv', 'SectorRisk', 'Default']
+    df_loan = df_loan[feature_choice]
     y = df_loan.pop('Default').values
     X = df_loan.values
     col_names = df_loan.columns
@@ -170,9 +170,9 @@ if __name__ == "__main__":
     # print_model_metrics(lg_model, X_train, X_test, y_train, y_test)
 
     ### Randome Forest model - feature importance
-    rfc = RandomForestClassifier(n_estimators=300, n_jobs=-1, random_state=2,)
-    print_model_metrics(rfc, X_train, X_test, y_train, y_test)
-    names = ['StateRisk', 'SectorRisk','Term', 'NumEmp', 'LowDocu', 'GrAppv', 'SBA_g','U_rate']
+    # rfc = RandomForestClassifier(n_estimators=300, n_jobs=-1, random_state=2,)
+    # print_model_metrics(rfc, X_train, X_test, y_train, y_test)
+    # names = ['StateRisk', 'SectorRisk','Term', 'NumEmp', 'LowDocu', 'GrAppv', 'SBA_g','U_rate']
     """Below code would hang when running. No error msg.  Need to investigate
     # features = [2, 5, 7, 3, 6]
     # plot_partial_dependence(rfc, X_train, features=features, feature_names=names) 
@@ -188,16 +188,16 @@ if __name__ == "__main__":
 
 
     ### Gradient Boost model - feature importance
-    gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=300, random_state=2,
-                                    min_samples_leaf=200, max_depth=3, max_features=3)
-    print_model_metrics(gbc, X_train, X_test, y_train, y_test)
-    features = [2, 7, 5, 6, 1]
-    plot_partial_dependence(gbc, X_train, features=features, feature_names=names) 
-    fig = plt.gcf()
-    fig.set_size_inches(11,8)
-    plt.tight_layout()
-    plt.savefig('images/gbc_partDepend.png')
-    plt.close()
+    # gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=300, random_state=2,
+    #                                 min_samples_leaf=200, max_depth=3, max_features=3)
+    # print_model_metrics(gbc, X_train, X_test, y_train, y_test)
+    # features = [2, 7, 5, 6, 1]
+    # plot_partial_dependence(gbc, X_train, features=features, feature_names=names) 
+    # fig = plt.gcf()
+    # fig.set_size_inches(11,8)
+    # plt.tight_layout()
+    # plt.savefig('images/gbc_partDepend.png')
+    # plt.close()
     # plot_feature_importance(gbc, X_sampled, col_names)
     # plt.savefig('images/gbc_feature_importances.png')
     # plt.close()
@@ -209,7 +209,6 @@ if __name__ == "__main__":
 
     ## Reduce model to 5 variables: Term, U_rate, SBA_g, GrAppv, Sector_Risk
     ## Conduct gridSearch to find the best fitting gbc model
-
     # gradient_boosting_grid = {'learning_rate': [0.2, 0.1, 0.05],
     #                           'max_depth': [3, 5],
     #                           'min_samples_leaf': [50, 200],
@@ -222,4 +221,24 @@ if __name__ == "__main__":
     #                                                            X_train, y_train)
     # te= time()
     # print("Time passed:", te-ts)
+    
+    ## Fit final gbc model with all train data and the optimized hyperparameters
+    # gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=500, random_state=2,
+    #                                 min_samples_leaf=50, max_depth=5, max_features=3)
+    # print_model_metrics(gbc, X_sampled, X_holdout, y_sampled, y_holdout)
+
+    # Fit final Logistic model with all train data and get the coefficients
+    scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
+    X_std = scaler.fit_transform(X_sampled)
+    lg_model = LogisticRegression(solver='saga')
+    lg_model.fit(X_std, y_sampled)
+    print("Coefficients:", lg_model.coef_)
+    X_holdout_std = scaler.transform(X_holdout)
+    y_pred = lg_model.predict(X_holdout_std)
+    name = lg_model.__class__.__name__
+    print('*'*30)
+    print("{} Accuracy (test):".format(name), accuracy_score(y_holdout, y_pred))
+    print("{} Precision (test):".format(name), precision_score(y_holdout, y_pred))
+    print("{} Recall (test):".format(name), recall_score(y_holdout, y_pred))
+
     
