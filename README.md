@@ -3,7 +3,7 @@
 # Table of Contents
 1. [Background & Motivation](#background)
 2. [Data](#data)
-3. [EDA](#eda)
+3. [EDA & Feature Engineering](#eda)
    1. [Location(State)](#state)
    2. [Sector](#sector)
    3. [Bank(Lender)](#bank)
@@ -104,7 +104,7 @@ The following actions are taken to transform the data:
 
 ![](images/unemployment.png)
 
-## 3. EDA <a name="eda"></a>
+## 3. EDA & Feature Engineering <a name="eda"></a>
 
 Which explanatory variables may be good predicators of whether a loan will go into default or not?  This section uses data exploratory analysis to investigate and gather useful features for the predicative model.  
 
