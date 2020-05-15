@@ -3,6 +3,16 @@ import pandas as pd
 from datetime import datetime 
 
 def pd_columnToNumber(df,col_name):
+    """
+    Convert number in strings to number
+
+    Args:
+        df(dataframe): a pandas dataframe to perform the conversion on
+        col_name (list): a list of column headers
+    Returns:
+        df: dataframe with numbers
+    """
+    
     for c in col_name:
         df[c] = [stringToNumber(x) for x in df[c]]
     return df
@@ -12,10 +22,11 @@ def stringToNumber(s):
     Convert number in accounting format from string to float.
 
     Args:
-    s: number as string in accounting format
+        s: number as string in accounting format
     Returns:
-    float number
+        float number
     """
+
     if type(s).__name__=="str":
         s = s.strip()
         if s =="-":
@@ -31,23 +42,23 @@ def fix_Date_Year(df, col_1, col_2):
     Some approval dates are imported as incorrect year (e.g. 2069 instead of 1969).  This function fixes it.
 
     Args:
-        df:     the dataframe 
-        col_1:  the col that contains the incorrect date
-        col_2:  the col that contains the correct reference year
+        df: the dataframe 
+        col_1: the col that contains the incorrect date
+        col_2: the col that contains the correct reference year
     Returns:
-        df:     updated dataframe
+        df: updated dataframe
     """
+
     for idx, date in enumerate(df[col_1]):
         year1 = date.year
-        #year2 = df[col_2][idx]
         year2 = df.loc[idx, col_2]
         if np.abs(year1-year2)>95:
             year1 -=100
-            #df[idx,col_1]=df[col_1][idx].replace(year=year1)
             df.loc[idx, col_1]=df.loc[idx, col_1].replace(year=year1)
     return df
 
 if __name__ == "__main__":
+
     df = pd.read_csv('data/SBAnational.csv', parse_dates=['ApprovalDate','ApprovalFY'])
     df['Sector'] = [int(str(x)[:2]) for x in df['NAICS']]
     df.loc[df['ApprovalFY']=='1976A','ApprovalFY']='1976'
@@ -77,4 +88,5 @@ if __name__ == "__main__":
                       df_ur.assign(grouper=df_ur['Date'].dt.to_period('M')),
                       how='left', on='grouper')
     df_new.drop(['grouper','Date'], axis=1, inplace=True)
+
     df_new.to_pickle('data/pickled_loan')   

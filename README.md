@@ -267,8 +267,25 @@ Given the feature importance study, I made a decison to further reduce the numbe
 | n_estimators     |     500 |        [500, 300] |
 | random_state     |       2 |                 2 |
 
-A final model with the optimal hyper-parameters and five explanatory variables are fit on the entire train dataset. 
 
 ### 4.3. Final Model <a name="final"></a>
 
+A final Gradient Boost model with the optimal hyper-parameters and five explanatory variables are fit on the entire training dataset.  The fitted model is then used to predict on the X observations in the holdout set that was aside from the beginning (20% of overall data).  The performance metrics are listed below. 
+
+| Gradient Boost Model|      Metrics | 
+|---------------------|-------------:|
+|    Precision        |        0.715 |
+|    Recall           |        0.913 |
+|    Accuracy         |        0.921 |
+
+A final Logistic model is also fitted with the selected five explanatory variables after standardardization.  The model coefficients are as the following:
+
+| Variable    | Intercept |  Term | U_rate | SBA_g | GrAppv | SectorRisk |
+|-------------|----------:|------:|-------:|------:|-------:|-----------:|
+| Coefficient |     -0.47 | -1.61 |  -0.25 |  0.03 |   0.29 |       0.29 |
+
+Signs on variables 'Term' and 'SectorRisk' are as expected.  Longer loan terms typically requires collaterals therefore reducing default risk.  Higher sector risk leads to higher probability that a loan will go into default.  Sign on the other three variables are counter-intuitive. We would expect higher unemployment rates indicate tougher economic times, therefore leading to more loan defaults.  Bigger loan notional or SBA guaranteed ratio should result in lower default risks.  But many factors can affect this such as colinearity between the feature variables.  Ultimately the relationship between the loan default and explanatory variables is non-linear.
+
 ## 5. Conclusion <a name="result"></a>
+
+The loan default classifier was trained on the undersampled training dataset of ~277,000 loans and tested on the holdout test set of ~177,500.  The model performance has been satisfactory with 92.1% overall accuracy.  Precision rate dropped from the 90% range in the training/test set to 71.5%.  I realized at the end of day that I should have resampled the overall dataset first before taking the holdout set.  This will be done in the next round of model iteration. 
