@@ -61,7 +61,7 @@ I found the dataset on kaggle.com, though it originally came from the U.S. SBA. 
 
 The following actions are taken to transform the data:
 
-* __NAICS__ (North American Industry Classification System):  This is a 2- through 6-digit hierachical classfication system used by the Federal agencies to classify business establishments for the purpose of statiscial collection, analysis, ana presentation of data.  The first two digits of NAICS represents the economic sector.  Even though the original data contains the 6-digit code (despite many missing values), efforts are taken to reduce the code to the first two digits, therefore summarizing the loans to the sector level.  The below table shows the description of the NAICS sectors, with more details found on the [U.S. Census page](https://www.census.gov/cgi-bin/sssd/naics/naicsrch?chart=2017).
+* __NAICS__ (North American Industry Classification System):  This is a 2- through 6-digit hierachical classfication system used by the Federal agencies to classify business establishments for the purpose of statiscial collection, analysis, and presentation of data.  The first two digits of NAICS represents the economic sector.  Even though the original data contains the 6-digit code (with many missing values), efforts are taken to reduce the code to the first two digits, therefore summarizing the loans to the sector level.  The below table shows the description of the NAICS sectors, with more details found on the [U.S. Census page](https://www.census.gov/cgi-bin/sssd/naics/naicsrch?chart=2017).
 
    | Sector | Description                                                              |
    |--------|--------------------------------------------------------------------------|
@@ -88,7 +88,7 @@ The following actions are taken to transform the data:
 
 * __ApprovalFY__: In the original data set, there are 18 observations with ApprovalFY='1976A'.  I am not able to find what the 'A' indicates.  I choose to convert these values to 1976, thereby collapsing these 18 data points to be with ApprovalFY='1976'.
 
-* __Franchise__: The original data set has mixed entry for this variable.  Entries '0000' and '0001' indicate there is no franchise, and franchise codes are entered wherever franchises are involved.  I choose to convert this variable to a Boolean type with 0 indicating no franchise and 1 otherwise. 
+* __Franchise__: The original data set has mixed entry for this variable.  Entries '0000' and '0001' indicate there is no franchise. Franchise codes are entered wherever franchises are involved.  I choose to convert this variable to a Boolean type with 0 indicating no franchise and 1 otherwise. 
 
 * __NewExist__ (1=Existing Business, 2=New Business): I choose to convert this variable to a Boolean type variable __NewBiz__ with 0 indicating existing business and 1 new business. 
 
@@ -100,7 +100,7 @@ The following actions are taken to transform the data:
 
 * __SBA Guaranteed Portion__:  The original dataset contains the gross loan amount and the SBA guaranteed amount.  I choose to divide the latter by the former to obtain a new variable __SBA_g__ which is the percent of loan that is guanranteed by SBA.  It is a variable with values between 0 and 1.
 
-* __U.S. Unemployment Rate__:  The final variable which isn't contained in the original SBA loan dataset is the U.S. unemployment rate, a monthly data series obtained from from the U.S. [Bureau of Labor Statistics](https://data.bls.gov/timeseries/LNS14000000). It is introduced as a proxy for where the U.S. economy stands during an economic cycle.  The unemployment rate data is merged with the SBA loan data on the loan approval date.  The thought behind this is loans issued during bad economic times (with high unemployment rate) can have higher default risk and vice versa. Below is a plot of the unemployment rate during 1965.01 to 2020.04.  Admittedly our SBA loan data ends roughly at mid 2014.
+* __U.S. Unemployment Rate__:  The final variable which isn't contained in the original SBA loan dataset is the U.S. unemployment rate, a monthly data series obtained from from the U.S. [Bureau of Labor Statistics](https://data.bls.gov/timeseries/LNS14000000). It is introduced as a proxy for where the U.S. economy stands during an economic cycle.  The unemployment rate data is merged with the SBA loan data on the loan approval date.  The thought behind this is loans issued during bad economic times (with high unemployment rate) can have higher default risk and vice versa. Below is a plot of the unemployment rate during 1965.01-2020.04.  Admittedly our SBA loan data ends roughly at mid 2014.
 
 ![](images/unemployment.png)
 
@@ -110,7 +110,7 @@ Which explanatory variables may be good predicators of whether a loan will go in
 
 ### 3.1. Location (State) <a name="state"></a>
 
-Location (in this case State) can be a possible indicator for potential loan risk.  The 50 states and Washington DC have different economic environments and industry concentration, therefore leading to different default rates.  As shown by the heat map below, loan default rates definitely vary across states with Florida leading the pack at around 27.4%.  This could be explained by Florida suffering more from the boom and bust of real estate cycles, as well as more natural disaters like typhoons.  In contrast, western states like Montana and Wyoming have lower loan default rates (in the 6% range).  This could be because these states traditionally relies on the oil and mineral industries which were more or less stable during the sample periods.     
+Location (in this case State) can be a possible indicator for potential loan risk.  The 50 states and Washington DC have different economic environments and industry concentration, therefore leading to different default rates.  As shown by the heat map below, loan default rates definitely vary across states with Florida leading the pack at around 27.4%.  This could be explained by Florida suffering more from the boom and bust of real estate cycles, as well as more natural disaters like hurricanes.  In contrast, western states like Montana and Wyoming have lower loan default rates (in the 6% range).  This could be because these states traditionally relies on the oil and mineral industries which were more or less stable during the sample periods.     
 
 ![](images/default_state.png)
 
@@ -122,7 +122,7 @@ The below bar charts shows the top 10 highest loan default sectors.  Cross-refer
 
 ### 3.3. Bank (Lender) <a name="bank"></a>
 
-Banking is an industry with high regulations.  Typically commercial banks have long established guidance to assess loan risks.  Therefore we wouldn't expect the commercial bank or which state the bank reside in has any impact on the loan default rates, unless the bank is not following the regulatory rules.  Since there are many banking/credit union entities in the data set, most of issue less than 1000 loans.  I choose to plot two histograms of all banks extending 1000+ or 3000+ loans, see below charts.  As expected, we can't make the association that banks with more loans issued have lower / higher default rates.   
+Banking is an industry with high regulations.  Typically commercial banks have long established guidance to assess loan risks.  Therefore we wouldn't expect the commercial bank or which state the bank resides in has any impact on the loan default rates, unless the bank is not following the regulatory rules.  Since there are many banking/credit union entities in the data set, most of issue less than 1000 loans.  I choose to plot two histograms of all banks extending 1000+ or 3000+ loans, see below charts.  As expected, we can't make the association that banks with more loans issued have lower / higher default rates.   
 
 ![](images/default_bank_3000.png)
 
@@ -130,8 +130,8 @@ Banking is an industry with high regulations.  Typically commercial banks have l
 
 ### 3.4. Business Characteristics <a name="business"></a>
 
-SBA dataset contains some business characteristics that might be influential in the performance of loans.  Specifically, 
-* New business? - the assumption is established business have a proven record of success with established customers, operation workflow, etc.  In contrast new businesses unproven and might not weather economic ups and downs as well.  However, calculated data indicates otherwise:
+The SBA dataset contains some business characteristics that might be influential in the performance of loans.  Specifically, 
+* New business? - the assumption is established business have a proven record of success with longer-term customers, operation workflow, etc.  In contrast new businesses are unproven and might not weather economic ups and downs as well.  However, calculated data indicates otherwise:
 
 |              | New Biz | Established Biz |
 |--------------|--------:|----------------:|
@@ -143,7 +143,7 @@ SBA dataset contains some business characteristics that might be influential in 
 |--------------|----------:|--------------:|
 | Default Rate |    15.16% |        17.68% |
 
-* Number of Employees? - below is a quartile table. It seems that Non-default loans have more employees.  Perhaps bigger in size? 
+* Number of Employees? - below is a quartile table. It seems that Non-default loans have slightly more employees.  Perhaps bigger in size? 
 
 | Quartiles    | Default | Non-Default |
 |--------------|--------:|------------:|
@@ -157,7 +157,7 @@ SBA dataset contains some business characteristics that might be influential in 
 
 Other variables relate more to the loan characteristics. Below are some comparisons of the quantiles for loans ending in default v.s. non-default. 
 
-__Loan Gross Disbursement__
+__Loan Gross Disbursement__ - Non-default loans seem to have higher notional amounts.
 | Quartiles    |    Default | Non-Default |
 |--------------|-----------:|------------:|
 | 100% maximum | $4,362,157 | $11,446,325 |
@@ -166,7 +166,7 @@ __Loan Gross Disbursement__
 | 25% quartile |    $28,055 |     $49,000 |
 | Minimum      |     $4,000 |      $4,000 |
 
-__Loan Term (months)__
+__Loan Term (months)__ - Non-default loans seem to be longer in term. 
 | Quartiles    | Default | Non-Default |
 |--------------|--------:|------------:|
 | 100% maximum |     461 | $11,446,325 |
@@ -175,7 +175,7 @@ __Loan Term (months)__
 | 25% quartile |      29 |          78 |
 | Minimum      |       0 |           0 |
 
-__SBA Guarantee Portion (%)__
+__SBA Guarantee Portion (%)__ - Non-default loans seem to have marginally higher percentage of SBA guarantee. 
 | Quartiles    | Default | Non-Default |
 |--------------|--------:|------------:|
 | 100% maximum |     100 |         100 |
@@ -184,12 +184,12 @@ __SBA Guarantee Portion (%)__
 | 25% quartile |      50 |          50 |
 | Minimum      |      12 |         2.8 |
 
-__Default_by_LowDocu__
+__Default_by_LowDocu__ - Counter-intuitively, loans with less documentation actually have lower default rate. 
 |              | LowDocu   | Non-LowDocu   |
 |--------------|----------:|--------------:|
 | Default Rate |    9.00%  |        18.74% |
 
-Based on these numbers, we can draw initial conclusions that loans with higher gross disbursement dollar amounts, with longer loan terms and higher SBA guarantee ratios tend to have lower default risk.  This could be explained by that businesses getting these types of loans are more established, bigger in operation sizes, or have other collaterals posted(e.g. real estates).
+Based on these data exploration, we can draw initial conclusions that loans with higher gross disbursement dollar amounts, longer loan terms and higher SBA guarantee ratios tend to have lower default risk.  This could be explained by that businesses getting these types of loans are more established, bigger in operation sizes, or have other collaterals posted(e.g. real estates).
 
 With the initial data EDA, I made the choice to select the following variables to model loan default risk: 
 * StateRisk
