@@ -209,11 +209,11 @@ The ultimate goal of this study is to have a model that has good predictive powe
 
 ### 4.1. Sampling <a name="sample"></a>
 
-Before hopping into the modeling topic, there is one last decison about the dataset to make.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has 9 attributes with the 9th being the loan defaulted or not.  The rest 8 attributes are the potential explanatory variables. A deeper look at the data reveals that the classes are not balanced.  The minority class (which is also the event we try to identify) takes about 20% of the 887,382 observations.  
+Before hopping into the modeling topic, there is one last decison to make about the dataset.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has 9 attributes with the 9th being the loan defaulted or not.  The rest 8 attributes are the potential explanatory variables. A deeper look at the data reveals that the classes are not balanced.  The minority class (which is also the event we try to identify) takes about 20% of the 887,382 observations.  
 
 To solve the imbalanced classes problem, two options are considered in the study:
 
-* Use the "class_weight" option that is built in some of the SKlearn models.  Setting this option to "balanced" results in an automatic weights adjustment by the inverse of class frequencies. 
+* Use the "class_weight" option that is built in some of the sklearn models.  Setting this option to "balanced" results in an automatic weights adjustment by the inverse of class frequencies. 
 
 * Perform resampling to balance the dataset before feeding the data to models.  Because I have enough data points for both the minority and majority classes.  I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class. After undersampling is done, I have a dataset of 276,579 observations. 
 
