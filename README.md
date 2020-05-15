@@ -3,7 +3,7 @@
 # Table of Contents
 1. [Background & Motivation](#background)
 2. [Data](#data)
-3. [Data EDA](#eda)
+3. [EDA](#eda)
    1. [Location(State)](#state)
    2. [Sector](#sector)
    3. [Bank(Lender)](#bank)
@@ -24,7 +24,7 @@ One way the SBA provides assistance to small businesses is to provide easier acc
 
 We are in the middle of the pandemic Covid-19.  It has brought sudden and significant threats not only to human health at the risk of overcrowding the medical system but also to normal economic operations when people stay at home to "flatten the curve".  Many small businesses are suffering.  On April 21, 2020, the U.S. Senate approved a $484 billion coronavirus relief package that would provide loans to distressed small businesses.  These loans are administered by commercial banks as the "Paycheck Protection Program (PPP) loans".  In this study, I would like to build models on historical SBA guaranteed loans.  My goal is to identify the key risk factors that differentiate high-risk loans (resulting in default) from low-risk loans (with full repayments). 
 
-## 2. Data & EDA <a name="data"></a>
+## 2. Data <a name="data"></a>
 
 I found the dataset on kaggle.com, though it originally came from the U.S. SBA.  It contains historical data from 1968 to 2014 (899,164 observations in total).  The variable name, the data type and a brief description of each variable is found in the below table:
 
@@ -104,7 +104,7 @@ The following actions are taken to transform the data:
 
 ![](images/unemployment.png)
 
-## 3. Data EDA <a name="eda"></a>
+## 3. EDA <a name="eda"></a>
 
 Which explanatory variables may be good predicators of whether a loan will go into default or not?  This section uses data exploratory analysis to investigate and gather useful features for the predicative model.  
 
