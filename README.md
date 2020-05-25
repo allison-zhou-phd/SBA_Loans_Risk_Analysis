@@ -116,7 +116,7 @@ Location (in this case State) can be a possible indicator for potential loan ris
 
 ### 3.2. Sector <a name="sector"></a>
 
-The below bar charts list the top 10 highest and bottom 10 lowest loan defaults by sectors.  Cross-referencing the sector NAICS table above, we can see that __sector 53__ is "Real estate and rental and leasing".  Real estate secotor is pro-cyclical and tends to overshoot in both economic booms and busts.  Since 1980, the United States has experienced at least two big real-estate led economic cycles, the most recent being the 2008-2009 financial crisis.  On the other side of the spectrum, __sector 21__ (Mining, quarring, and oil and gas extraction), __sector 11__ (Agriculture, forestry, fishing and hunting), __sector 55__ (Management), and __sector 62__ (Health care and social assistance) suffer from lower loan default risks (in the 10% range) either because the sector is acyclical or hasn't experienced significant downward price adjustments.  (The same cannot be said about oil and gas industry in the Covid-19 Crisis, though the cause is not the virus alone.) 
+The below bar charts list the top 10 highest and bottom 10 lowest loan defaults by sectors.  Cross-referencing the sector NAICS table above, we can see that __sector 53__ is "Real estate and rental and leasing".  Real estate secotor is pro-cyclical and tends to overshoot in both economic booms and busts.  Since 1980, the United States has experienced at least two big real-estate led economic cycles, the most recent being the 2008-2009 financial crisis.  On the other side of the spectrum, __sector 21__ (Mining, quarring, and oil and gas extraction), __sector 11__ (Agriculture, forestry, fishing and hunting), __sector 55__ (Management), and __sector 62__ (Health care and social assistance) suffer from lower loan default risks (in the 10% and under range) either because the sector is acyclical or hasn't experienced significant downward price adjustments.  (The same cannot be said about oil and gas industry in the Covid-19 Crisis, though the cause is not the virus alone.) 
 
 ![](images/default_sector_top10.png)
 
@@ -124,7 +124,7 @@ The below bar charts list the top 10 highest and bottom 10 lowest loan defaults 
 
 ### 3.3. Bank (Lender) <a name="bank"></a>
 
-Banking is an industry with high regulations.  Typically commercial banks have long established guidance to assess loan risks.  Therefore we wouldn't expect the commercial bank or which state the bank resides in has any impact on the loan default rates, unless the bank is not following the regulatory rules.  Since there are many banking/credit union entities in the data set, most of issue less than 1000 loans.  I choose to plot two histograms of all banks extending 1000+ or 3000+ loans, see below charts.  As expected, we can't make the association that banks with more loans issued have lower / higher default rates.   
+Banking is an industry with high regulations.  Typically commercial banks have long established guidance to assess loan risks.  Therefore we wouldn't expect the commercial bank or the specific state that the bank resides in has any impact on the loan default rates, unless the bank is not following the regulatory rules.  Since there are many banking/credit union entities in the data set, most of which issue less than 1000 loans.  I choose to plot two histograms of all banks extending 1000+ or 3000+ loans (see below charts).  As expected, we can't make the association that banks with more loans issued have lower / higher default rates.   
 
 ![](images/default_bank_3000.png)
 
@@ -133,19 +133,19 @@ Banking is an industry with high regulations.  Typically commercial banks have l
 ### 3.4. Business Characteristics <a name="business"></a>
 
 The SBA dataset contains some business characteristics that might be influential in the performance of loans.  Specifically, 
-* New business? - the assumption is established business have a proven record of success with longer-term customers, operation workflow, etc.  In contrast new businesses are unproven and might not weather economic ups and downs as well.  However, calculated data indicates otherwise:
+* __New business__ - the assumption is that established business have a proven record of success with longer-term customers, operation workflow, etc.  In contrast new businesses are unproven and might not weather economic ups and downs as well.  However, calculated data indicates otherwise:
 
 |              | New Biz | Established Biz |
 |--------------|--------:|----------------:|
 | Default Rate |  18.60% |          17.11% |
 
-* Franchised? - similar to the new business, one can argue that business with a franchised model might have a lower risk to default on loans.  This is because franchised businesses tend to have established business plans, target clientiles, smoothed supply chains, etc.  Yet the calculated data indicates otherwise:
+* __Franchised__ - similar to the new business consideration, one might argue that business with a franchised model might have a lower risk to default on loans.  This is because franchised businesses tend to have established business plans, target clientiles, smoothed supply chains, etc.  Yet the calculated data indicates non-franchised businesses only have marginally higher default rates than their franchised couterparts.
 
 |              | Franchise | Non-Franchise |
 |--------------|----------:|--------------:|
 | Default Rate |    15.16% |        17.68% |
 
-* Number of Employees? - below is a quartile table. It seems that Non-default loans have slightly more employees.  Perhaps bigger in size? 
+* __Number of Employees__ - below is a quartile table of comparison. It seems that Non-default loans have slightly more employees.  Perhaps bigger in size? 
 
 | Quartiles    | Default | Non-Default |
 |--------------|--------:|------------:|
@@ -157,9 +157,10 @@ The SBA dataset contains some business characteristics that might be influential
 
 ### 3.5. Loan Characteristics <a name="loan"></a>
 
-Other variables relate more to the loan characteristics. Below are some comparisons of the quantiles for loans ending in default v.s. non-default. 
+The rest of variables relate more to the loan characteristics. Below are some comparisons of the quantiles for loans ending in default v.s. non-default. 
 
-__Loan Gross Disbursement__ - Non-default loans seem to have higher notional amounts.
+* __Loan Gross Disbursement__ - Non-default loans seem to have higher notional amounts.
+
 | Quartiles    |    Default | Non-Default |
 |--------------|-----------:|------------:|
 | 100% maximum | $4,362,157 | $11,446,325 |
@@ -168,16 +169,18 @@ __Loan Gross Disbursement__ - Non-default loans seem to have higher notional amo
 | 25% quartile |    $28,055 |     $49,000 |
 | Minimum      |     $4,000 |      $4,000 |
 
-__Loan Term (months)__ - Non-default loans seem to be longer in term. 
+* __Loan Term (months)__ - Non-default loans seem to be considerably longer in term. 
+
 | Quartiles    | Default | Non-Default |
 |--------------|--------:|------------:|
-| 100% maximum |     461 | $11,446,325 |
+| 100% maximum |     461 |         569 |
 | 75% quartile |      68 |         180 |
 | 50% median   |      49 |          84 |
 | 25% quartile |      29 |          78 |
 | Minimum      |       0 |           0 |
 
-__SBA Guarantee Portion (%)__ - Non-default loans seem to have marginally higher percentage of SBA guarantee. 
+* __SBA Guarantee Portion (%)__ - Non-default loans seem to have higher percentage of SBA guarantee, especially for the top 50% percentile.
+
 | Quartiles    | Default | Non-Default |
 |--------------|--------:|------------:|
 | 100% maximum |     100 |         100 |
@@ -191,7 +194,7 @@ __Default_by_LowDocu__ - Counter-intuitively, loans with less documentation actu
 |--------------|----------:|--------------:|
 | Default Rate |    9.00%  |        18.74% |
 
-Based on these data exploration, we can draw initial conclusions that loans with higher gross disbursement dollar amounts, longer loan terms and higher SBA guarantee ratios tend to have lower default risk.  This could be explained by that businesses getting these types of loans are more established, bigger in operation sizes, or have other collaterals posted(e.g. real estates).
+Based on these data exploration, we can draw initial conclusions that loans with higher gross disbursement dollar amounts, longer loan terms and higher SBA guarantee ratios tend to have lower default risk.  This could be explained by that businesses getting these types of loans are more established in nature, bigger in operation sizes, and/or have other collaterals posted(e.g. real estates).
 
 With the initial data EDA, I made the choice to select the following variables to model loan default risk: 
 * StateRisk
@@ -203,7 +206,7 @@ With the initial data EDA, I made the choice to select the following variables t
 * SBA_Guaranteed_Ratio(SBA_g)
 * Unemployment(U_rate)  
 
-For StateRisk and SectorRisk, additional bucketing is done to convert the variables into numeric values.  For StateRisk, any state with a default rate higher than 18%(inclusive) is categorized as high risk (value=2). States with default rate between 10% and 18%(not inclusive) are rated 1 and those with default rate lower than 10% are rated 0.  For SectorRisk, ratings are similarly chosen amongst 0, 1, and 2, with the cutoff levels at default rate equal to 10% or 20%. 
+For StateRisk and SectorRisk, additional bucketing is done to convert the variables into numeric values.  For StateRisk, any state with a default rate higher than 18%(inclusive) is categorized as high risk (value=2). States with default rate between 10%(inclusive) and 18%(exclusive) are rated 1 and those with default rate lower than 10%(exclusive) are rated 0.  For SectorRisk, ratings are similarly chosen amongst 2, 1, and 0, with the threshold cutoff levels at 20% and 10% respectively. 
 
 ## 4. Sampling, Modeling & Comparison <a name="model"></a>
 
