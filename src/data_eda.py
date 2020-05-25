@@ -98,18 +98,18 @@ def plot_pca_explained_var(ax, pca):
 
 if __name__ == "__main__":
 
-    us_unemploy = pd.read_csv('data/us_unemployment.csv', index_col=0)
-    ur = us_unemploy.values.reshape(-1,1)[:-8]
-    date_range = pd.date_range('1965-01','2020-05', freq='M')
-    df_ur = pd.DataFrame(data=ur, index=date_range, columns=['U_rate'])
-    fig, ax = plt.subplots(figsize=(8,4))
-    ax.plot(df_ur)
-    ax.set_title("U.S. Unemployment Rate (1965.01-2020.04)")
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Unemployment Rate")
-    plt.tight_layout()
-    plt.savefig('images/unemployment.png')
-    plt.close()
+    # us_unemploy = pd.read_csv('data/us_unemployment.csv', index_col=0)
+    # ur = us_unemploy.values.reshape(-1,1)[:-8]
+    # date_range = pd.date_range('1965-01','2020-05', freq='M')
+    # df_ur = pd.DataFrame(data=ur, index=date_range, columns=['U_rate'])
+    # fig, ax = plt.subplots(figsize=(8,4))
+    # ax.plot(df_ur)
+    # ax.set_title("U.S. Unemployment Rate (1965.01-2020.04)")
+    # ax.set_xlabel("Time")
+    # ax.set_ylabel("Unemployment Rate")
+    # plt.tight_layout()
+    # plt.savefig('images/unemployment.png')
+    # plt.close()
 
     df = pd.read_pickle('data/pickled_loan')
     df.drop(['grouper','Date'], axis=1, inplace=True)
@@ -119,22 +119,20 @@ if __name__ == "__main__":
     # m = heatmap_state(df_state, columns, 'Default Rate (%)', 'YlGn')
 
     plot_default_rate(df, 'Sector', "Default Rate by Sector (top 10)", ascending=False)
-    plt.tight_layout()
     plt.savefig('images/default_sector_top10.png')
     plt.close()
 
     plot_default_rate(df, 'Sector', "Default Rate by Sector (bottom 10)", ascending=True)
     plt.savefig('images/default_sector_bottom10.png')
-    plt.tight_layout()
     plt.close()
 
-    plot_default_rate(df, 'Bank', "Loan Default Rate by Bank Histogram (3000+ loans)", cutoff=3000, bins=10)
-    plt.savefig('images/default_bank_3000.png')
-    plt.close()
+    # plot_default_rate(df, 'Bank', "Loan Default Rate by Bank Histogram (3000+ loans)", cutoff=3000, bins=10)
+    # plt.savefig('images/default_bank_3000.png')
+    # plt.close()
 
-    plot_default_rate(df, 'Bank', "Loan Default Rate by Bank Histogram (1000+ loans)", cutoff=1000, bins=10)
-    plt.savefig('images/default_bank_1000.png')
-    plt.close()
+    # plot_default_rate(df, 'Bank', "Loan Default Rate by Bank Histogram (1000+ loans)", cutoff=1000, bins=10)
+    # plt.savefig('images/default_bank_1000.png')
+    # plt.close()
 
     ### Additional feature engineering and save final data to pickle file
     # df['SBA_g'] = df['SBA_Appv']/df['GrAppv']
