@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime 
 
-def pd_columnToNumber(df,col_name):
+def pd_column_to_number(df,col_name):
     """
     Convert number in strings to number
 
@@ -14,10 +14,10 @@ def pd_columnToNumber(df,col_name):
     """
     
     for c in col_name:
-        df[c] = [stringToNumber(x) for x in df[c]]
+        df[c] = [string_to_number(x) for x in df[c]]
     return df
 
-def stringToNumber(s):
+def string_to_number(s):
     """
     Convert number in accounting format from string to float.
 
@@ -37,7 +37,7 @@ def stringToNumber(s):
                 s = s.replace("(","-").replace(")","")
     return float(s)
 
-def fix_Date_Year(df, col_1, col_2):
+def fix_date_year(df, col_1, col_2):
     """
     Some approval dates are imported as incorrect year (e.g. 2069 instead of 1969).  This function fixes it.
 
@@ -69,11 +69,11 @@ if __name__ == "__main__":
     df['LowDocu'] = df['LowDoc'].map({0:0, 1:1, 'N':0, 'Y':1})
     df['Default'] = df['MIS_Status'].map({'P I F':0, 'CHGOFF': 1})
     cols = ['DisbursementGross', 'BalanceGross', 'ChgOffPrinGr', 'GrAppv', 'SBA_Appv']
-    df = pd_columnToNumber(df, cols)
+    df = pd_column_to_number(df, cols)
     df = df.rename(columns={'LoanNr_ChkDgt':'LoanNr', 'NoEmp':'NumEmp', 'DisbursementDate':'DisburseDate', 'DisbursementGross':'DisburseGross'})
     df_loan = df[['LoanNr','State','Bank','BankState','Sector','ApprovalDate','ApprovalFY','Term','NumEmp','NewBiz',
                   'CreateJob','RetainedJob','Franchise','UrbanRural','LowDocu','DisburseDate','DisburseGross','GrAppv','SBA_Appv','Default']]
-    df_loan = fix_Date_Year(df_loan, 'ApprovalDate', 'ApprovalFY')
+    df_loan = fix_date_year(df_loan, 'ApprovalDate', 'ApprovalFY')
     df_loan = df_loan.dropna()
 
     # read in the monthly unemployment data and merge with the the loan data on the same year/month

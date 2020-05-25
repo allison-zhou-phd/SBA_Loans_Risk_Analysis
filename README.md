@@ -206,21 +206,21 @@ With the initial data EDA, I made the choice to select the following variables t
 * SBA_Guaranteed_Ratio(SBA_g)
 * Unemployment(U_rate)  
 
-For StateRisk and SectorRisk, additional bucketing is done to convert the variables into numeric values.  For StateRisk, any state with a default rate higher than 18%(inclusive) is categorized as high risk (value=2). States with default rate between 10%(inclusive) and 18%(exclusive) are rated 1 and those with default rate lower than 10%(exclusive) are rated 0.  For SectorRisk, ratings are similarly chosen amongst 2, 1, and 0, with the threshold cutoff levels at 20% and 10% respectively. 
+For StateRisk and SectorRisk, additional bucketing is done to convert the variables into numeric values.  For StateRisk, any state with a default rate higher than 18%(inclusive) is categorized as high risk (value=2). States with default rate between 10%(inclusive) and 18%(exclusive) are rated 1 and those with default rate lower than 10%(exclusive) are rated 0.  For SectorRisk, ratings are similarly chosen amongst 2, 1, and 0, with the cutoff levels at 20% and 10% respectively. 
 
 ## 4. Sampling, Modeling & Comparison <a name="model"></a>
 
-The ultimate goal of this study is to have a model that has good predictive power in loan defaults.  Various models are tried and this section details the steps taken and the performance comparison of various models.  
+The ultimate goal of this study is to identify a model that has good predictive power in loan defaults.  This section details the steps taken in fitting various models, the performance comparison, and the final model selection.  
 
 ### 4.1. Sampling <a name="sample"></a>
 
-Before hopping into the modeling topic, there is one last decison to make about the dataset.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has 9 attributes with the 9th being the loan defaulted or not.  The rest 8 attributes are the potential explanatory variables. A deeper look at the data reveals that the classes are not balanced.  The minority class (which is also the event we try to identify) takes about 20% of the 887,382 observations.  
+Before hopping into the modeling topic, there is one last decison to be made about the dataset.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has 9 attributes with the 9th being the model target - whether loan defaulted or not.  The rest 8 features are the explanatory variables. A deeper look at the data reveals that the two classes (default/non-default) are not balanced.  The minority class (default, which is also the event we try to identify) takes about 20% of the 887,382 observations.  
 
 To solve the imbalanced classes problem, two options are considered in the study:
 
-* Use the "class_weight" option that is built in some of the sklearn models.  Setting this option to "balanced" results in an automatic weights adjustment by the inverse of class frequencies. 
+* Use the "class_weight" option that is built in some of the scikit-learn models.  Setting this option to "balanced" results in an automatic weights adjustment by the inverse of class frequencies. 
 
-* Perform resampling to balance the dataset before feeding the data to models.  Because I have enough data points for both the minority and majority classes.  I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class. After undersampling is done, I have a dataset of 276,579 observations. 
+* Perform resampling to balance the dataset before feeding the data to the model.  Because I have enough data points for both the minority and majority classes, I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class. After undersampling is done, I have a dataset of 276,579 observations. 
 
 Both of these options are tried on four types of models: Logistic Regression, Random Forest, Gradient Boosted Classifier, and AdaBoost Classifier.  The resulting model metrics on the test data are listed in the below table.  All models are run on the selected 8 explanatory variables.  
 
@@ -243,17 +243,17 @@ Both of these options are tried on four types of models: Logistic Regression, Ra
 |    Recall           |        0.763 |       0.900 |
 |    Accuracy         |        0.934 |       0.908 |
 
-Comparing the model performance metrics between the two sampling options, it is easy to see that the Undersample method does matter in the great majority of cases.  Therefore this option is chosen.  Amongst the model selections, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boost to identify features of importance.   
+Comparing the model performance metrics between the two sampling options, it is easy to see that the Undersample method does better in the great majority of cases.  Therefore the undersample option is chosen.  Amongst the model tested, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boost to identify features of importance.   
 
 ### 4.2. Modeling & Comparison <a name="compare"></a>
 
-With the resampled data and original 8 features, a Random Forest model and a Gradient Boost model are fitted separately.  The goal is see if both models will identify the same set of important features
+With the resampled data and original 8 features, a Random Forest model and a Gradient Boost model are fitted separately.  The goal is see if both models will identify the same set of important features.
 
-* Random Forest Model - as the below chart indicates, the most imoportant feature in predicting loan default risk is loan term ('Term'), explaining about 58% of the information gain.  This is followed by gross loan amount ('GrAppv'), the unemployment rate ('U_rate'), number of employees(NumEmp), SBA guaranteed percent('SBA_g'). 
+* __Random Forest Model__ - as the below chart indicates, the most imoportant feature in predicting loan default risk is loan term ('Term'), explaining about 58% of the information gain.  This is followed by gross loan amount ('GrAppv'), the unemployment rate ('U_rate'), number of employees(NumEmp), and SBA guaranteed percent('SBA_g'). 
 
 ![](images/rfc_feature_importances.png)
 
-* Gradient Boost Model - Like the Random Forest model, the most important feature is 'Term', explaining almost 76% of the information gain.  In a decreasing order, the next four important features are 'U_rate', 'GrAppv', 'SBA_g', and 'SectorRisk'.  There is actually a very good overlap between the two models. Four out of the five most important features are the same.  
+* __Gradient Boost Model__ - Like the Random Forest model, the most important feature is 'Term', explaining almost 76% of the information gain.  In a decreasing order, the next four important features are 'U_rate', 'GrAppv', 'SBA_g', and 'SectorRisk'.  There is actually a very good overlap between the two models. Four out of the five most important features are the same.  
 
 ![](images/gbc_feature_importances.png)
 

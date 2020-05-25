@@ -5,3 +5,4 @@
 *.pdf
 pickled_loan
 loan_data
+*.pyc
