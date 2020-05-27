@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 plt.rcParams.update({'font.size': 12})
-from time import time
 
 from sklearn.preprocessing import StandardScaler 
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -14,34 +13,6 @@ from sklearn.inspection import plot_partial_dependence
 
 from src.default_modeler import DefaultModeler, undersample
 
-def gridsearch_with_output(estimator, parameter_grid, X_train, y_train):
-    """
-    Grid search
-
-    Args:
-        estimator: the type of model (e.g. RandomForestClassifier())
-        paramter_grid: dictionary defining the gridsearch parameters
-        X_train: ndarray - 2D
-        y_train: ndarray - 1D
-    Returns:  
-        Best parameters and model fit with those parameters
-    """
-
-    model_gridsearch = GridSearchCV(estimator,
-                                    parameter_grid,
-                                    n_jobs=-1,
-                                    verbose=True)
-    model_gridsearch.fit(X_train, y_train)
-    best_params = model_gridsearch.best_params_ 
-    model_best = model_gridsearch.best_estimator_
-    print("\nResult of gridsearch:")
-    print("{0:<20s} | {1:<8s} | {2}".format("Parameter", "Optimal", "Gridsearch values"))
-    print("-" * 55)
-    for param, vals in parameter_grid.items():
-        print("{0:<20s} | {1:<8s} | {2}".format(str(param), 
-                                                str(best_params[param]),
-                                                str(vals)))
-    return best_params, model_best
 
 def compare_models(dm_lst, X_train, X_test, y_train, y_test):
     """ 
@@ -79,9 +50,26 @@ if __name__ == "__main__":
 
     ### X_model and y_model to be used in training the model, the holdout sets for final model evaluation
     (X_model, X_holdout, y_model, y_holdout), col_names = load_split_data()
+    X_train, X_test, y_train, y_test = train_test_split(X_model, y_model, test_size=0.2, random_state=42, stratify=y_model)
+    
+    ### Rely on the undersample method to balance the data
+    # target_ratio = 0.45
+    # X_sampled, y_sampled = undersample(X_model, y_model, target_ratio)
+
+    # lg_model = LogisticRegression(solver='lbfgs')
+    # dm_lg = DefaultModeler(lg_model)
+    # rfc = RandomForestClassifier(n_estimators=300, n_jobs=-1, random_state=2)
+    # dm_rfc = DefaultModeler(rfc)
+    # gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=300, random_state=2,
+    #                                  min_samples_leaf=200, max_depth=3, max_features=3)
+    # dm_gbc = DefaultModeler(gbc)
+    # abc = GradientBoostingClassifier(learning_rate=0.2, loss='exponential', n_estimators=300, random_state=2,
+    #                                  min_samples_leaf=200, max_depth=3, max_features=3)
+    # dm_abc = DefaultModeler(abc)
+    # dm_lst = [dm_lg, dm_rfc, dm_gbc, dm_abc]
+    # compare_models(dm_lst, X_sampled, X_test, y_sampled, y_test)
 
     ### Rely on class_weight option to balance the data
-    X_train, X_test, y_train, y_test = train_test_split(X_model, y_model, test_size=0.2, random_state=42, stratify=y_model)
     lg = LogisticRegression(solver='lbfgs', class_weight='balanced')
     dm_lg = DefaultModeler(lg)
     rfc = RandomForestClassifier(n_estimators=300, n_jobs=-1, random_state=2, class_weight='balanced')
@@ -95,33 +83,16 @@ if __name__ == "__main__":
     dm_lst = [dm_lg, dm_rfc, dm_gbc, dm_abc]
     compare_models(dm_lst, X_train, X_test, y_train, y_test)
   
-    ### Rely on the undersample method to balance the data
-    target_ratio = 0.45
-    X_sampled, y_sampled = undersample(X_model, y_model, target_ratio)
-
-    lg_model = LogisticRegression(solver='lbfgs')
-    dm_lg = DefaultModeler(lg_model)
-    rfc = RandomForestClassifier(n_estimators=300, n_jobs=-1, random_state=2)
-    dm_rfc = DefaultModeler(rfc)
-    gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=300, random_state=2,
-                                     min_samples_leaf=200, max_depth=3, max_features=3)
-    dm_gbc = DefaultModeler(gbc)
-    abc = GradientBoostingClassifier(learning_rate=0.2, loss='exponential', n_estimators=300, random_state=2,
-                                     min_samples_leaf=200, max_depth=3, max_features=3)
-    dm_abc = DefaultModeler(abc)
-    dm_lst = [dm_lg, dm_rfc, dm_gbc, dm_abc]
-    compare_models(dm_lst, X_sampled, X_test, y_sampled, y_test)
-
     ### Plot feature importance and partial dependence
-    dm_rfc.plot_feature_importance(X_sampled, col_names)
+    dm_rfc.plot_feature_importance(X_train, col_names)
     plt.savefig('images/rfc_feature_importances.png')
     plt.close()
-    dm_gbc.plot_feature_importance(X_sampled, col_names)
+    dm_gbc.plot_feature_importance(X_train, col_names)
     plt.savefig('images/gbc_feature_importances.png')
     plt.close()
 
     features = [2, 7, 5, 6, 1]
-    plot_partial_dependence(gbc, X_sampled, features=features, feature_names=col_names) 
+    plot_partial_dependence(gbc, X_train, features=features, feature_names=col_names) 
     fig = plt.gcf()
     fig.set_size_inches(11,8)
     plt.tight_layout()

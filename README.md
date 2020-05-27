@@ -214,40 +214,40 @@ The ultimate goal of this study is to identify a model that has good predictive 
 
 ### 4.1. Sampling <a name="sample"></a>
 
-Before hopping into the modeling topic, there is one last decison to be made about the dataset.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has 9 attributes with the 9th being the model target - whether loan defaulted or not.  The rest 8 features are the explanatory variables. A deeper look at the data reveals that the two classes (default/non-default) are not balanced.  The minority class (default, which is also the event we try to identify) takes about 20% of the 887,382 observations.  
+Before hopping into the modeling topic, there is one last decison to be made about the dataset.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has nine attributes with the 9th being the model target - whether the loan defaulted or not.  The rest eight features are the explanatory variables. A deeper look at the data reveals that the two classes (default/non-default) are not balanced.  The minority class (default, which is also the event we try to identify) takes about 20% of the 887,382 observations.  
 
 To solve the imbalanced classes problem, two options are considered in the study:
 
 * Use the "class_weight" option that is built in some of the scikit-learn models.  Setting this option to "balanced" results in an automatic weights adjustment by the inverse of class frequencies. 
 
-* Perform resampling to balance the dataset before feeding the data to the model.  Because I have enough data points for both the minority and majority classes, I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class. After undersampling is done, I have a dataset of 276,579 observations. 
+* Perform resampling to balance the dataset before feeding the data to the model.  Because I have enough data points for both the minority and majority classes, I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class. After undersampling is performed, I have a dataset of 276,579 observations. 
 
-Both of these options are tried on four types of models: Logistic Regression, Random Forest, Gradient Boosted Classifier, and AdaBoost Classifier.  The resulting model metrics on the test data are listed in the below table.  All models are run on the selected 8 explanatory variables.  
+Both of these options are tried on four types of models: Logistic Regression, Random Forest, Gradient Boosted Classifier, and AdaBoost Classifier.  The resulting model metrics on the test data are listed in the below table.  All models are run on the selected eight explanatory variables.  
 
 | Models              | Class_weight | Undersample |
 |---------------------|-------------:|------------:|
 | __Logistic Regression__ |              |             |
-|    Precision        |        0.367 |       0.687 |
-|    Recall           |        0.071 |       0.054 |
-|    Accuracy         |        0.816 |       0.564 |
+|    Precision        |        0.367 |       0.369 |
+|    Recall           |        0.071 |       0.056 |
+|    Accuracy         |        0.816 |       0.818 |
 | __Random Forest__       |              |             |
-|    Precision        |        0.836 |       0.895 |
-|    Recall           |        0.746 |       0.879 |
-|    Accuracy         |        0.930 |       0.899 |
+|    Precision        |        0.836 |       0.770 |
+|    Recall           |        0.746 |       0.994 |
+|    Accuracy         |        0.930 |       0.947 |
 | __Gradient Boost__      |              |             |
-|    Precision        |        0.847 |       0.898 |
-|    Recall           |        0.771 |       0.879 |
-|    Accuracy         |        0.935 |       0.899 |
+|    Precision        |        0.847 |       0.704 |
+|    Recall           |        0.771 |       0.904 |
+|    Accuracy         |        0.935 |       0.917 |
 | __Ada Boost__           |              |             |
-|    Precision        |        0.848 |       0.895 |
+|    Precision        |        0.848 |       0.697 |
 |    Recall           |        0.763 |       0.900 |
-|    Accuracy         |        0.934 |       0.908 |
+|    Accuracy         |        0.934 |       0.914 |
 
-Comparing the model performance metrics between the two sampling options, it is easy to see that the Undersample method does better in the great majority of cases.  Therefore the undersample option is chosen.  Amongst the model tested, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boost to identify features of importance.   
+Three model performance metrics between the two sampling options are listed: Precision, Recall and Accuracy.  For this study, we care first and foremost about the Precision metric.  That is, we don't want to predict a loan going into default when it doesn't in fact.  Ultimately, the goal of SBA loan guarantee is to assist small business owners in obtaining much needed capital. Secondly, we would also want the model to have a good overall accuracy rate after the imbalanced dataset problem is corrected.  Based on these two criteria, the class_weight option is chosen.  Amongst the model tested, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boost to identify the features of importance.   
 
 ### 4.2. Modeling & Comparison <a name="compare"></a>
 
-With the resampled data and original 8 features, a Random Forest model and a Gradient Boost model are fitted separately.  The goal is see if both models will identify the same set of important features.
+With the original eight features, a Random Forest model and a Gradient Boost model are fitted separately while setting the class_weight option to balanced.  The goal is see if both models will identify the same set of important features.
 
 * __Random Forest Model__ - as the below chart indicates, the most imoportant feature in predicting loan default risk is loan term ('Term'), explaining about 58% of the information gain.  This is followed by gross loan amount ('GrAppv'), the unemployment rate ('U_rate'), number of employees(NumEmp), and SBA guaranteed percent('SBA_g'). 
 
@@ -265,17 +265,17 @@ Given the feature importance study, I made a decison to further reduce the numbe
 
 | Parameter        | Optimal | Gridsearch Values |
 |------------------|--------:|------------------:|
-| learning rate    |     0.2 |  [0.2, 0.1, 0.05] |
+| learning_rate    |    0.2  |  [0.2, 0.1, 0.05] |
 | max_depth        |       5 |            [3, 5] |
-| min_samples_leaf |      50 |         [50, 200] |
-| max_features     |       3 |             [2,3] |
-| n_estimators     |     500 |        [500, 300] |
+| min_samples_leaf |      50 |    [50, 100, 200] |
+| max_features     |       3 |            [2, 3] |
+| n_estimators     |     500 |        [300, 500] |
 | random_state     |       2 |                 2 |
 
 
 ### 4.3. Final Model <a name="final"></a>
 
-A final Gradient Boost model with the optimal hyper-parameters and five explanatory variables are fit on the entire training dataset.  The fitted model is then used to predict on the X observations in the holdout set that was aside from the beginning (20% of overall data).  The performance metrics are listed below. 
+A final Random Forest model with the optimal hyper-parameters and five explanatory variables are fit on the entire training dataset.  The fitted model is then used to predict the loan defaults on the holdout data set aside from the beginning (20% of overall data).  The performance metrics are listed below. 
 
 | Gradient Boost Model|      Metrics | 
 |---------------------|-------------:|
@@ -285,11 +285,11 @@ A final Gradient Boost model with the optimal hyper-parameters and five explanat
 
 A final Logistic model is also fitted with the selected five explanatory variables after standardardization.  The model coefficients are as the following:
 
-| Variable    | Intercept |  Term | U_rate | SBA_g | GrAppv | SectorRisk |
+| Variable    | Intercept |  Term | GrAppv | U_rate | SBA_g | SectorRisk |
 |-------------|----------:|------:|-------:|------:|-------:|-----------:|
-| Coefficient |     -0.47 | -1.61 |  -0.25 |  0.03 |   0.29 |       0.29 |
+| Coefficient |     -0.47 | -1.61 |  0.29  | -0.25 |   0.03 |       0.29 |
 
-Signs on variables 'Term' and 'SectorRisk' are as expected.  Longer loan terms typically requires collaterals therefore reducing default risk.  Higher sector risk leads to higher probability that a loan will go into default.  Sign on the other three variables are counter-intuitive. We would expect higher unemployment rates indicate tougher economic times, therefore leading to more loan defaults.  Bigger loan notional or SBA guaranteed ratio should result in lower default risks.  But many factors can affect this such as colinearity between the feature variables.  Ultimately the relationship between the loan default and explanatory variables is non-linear.
+Signs on variables 'Term' and 'SectorRisk' are as expected.  Longer loan terms typically requires collaterals therefore reducing default risk.  Higher sector risk leads to higher probability that a loan will go into default.  Sign on the other three variables are counter-intuitive. We would expect higher unemployment rates to indicate tougher economic times, therefore leading to more loan defaults.  Bigger loan notional or SBA guaranteed ratio should result in lower default risks.  But many factors can affect this such as colinearity between the feature variables.  Ultimately the relationship between the loan default and explanatory variables is non-linear.
 
 ## 5. Conclusion <a name="result"></a>
 
