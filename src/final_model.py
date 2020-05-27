@@ -5,7 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler 
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
 
 from src.default_modeler import DefaultModeler, undersample
 
@@ -81,6 +81,8 @@ if __name__ == "__main__":
     dm_gbc = DefaultModeler(gbc)
     #dm_rfc.print_model_metrics(X_sampled, X_holdout, y_sampled, y_holdout)
     dm_gbc.print_model_metrics(X_model, X_holdout, y_model, y_holdout)
+    y_pred = gbc.predict(X_holdout) 
+    print(confusion_matrix(y_holdout, y_pred))
 
     ## Fit final Logistic model with all train data and get the coefficients
     scaler = StandardScaler(copy=True, with_mean=True, with_std=True)

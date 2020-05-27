@@ -222,7 +222,7 @@ To solve the imbalanced classes problem, two options are considered in the study
 
 * Perform resampling to balance the dataset before feeding the data to the model.  Because I have enough data points for both the minority and majority classes, I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class. After undersampling is performed, I have a dataset of 276,579 observations. 
 
-Both of these options are tried on four types of models: Logistic Regression, Random Forest, Gradient Boosted Classifier, and AdaBoost Classifier.  The resulting model metrics on the test data are listed in the below table.  All models are run on the selected eight explanatory variables.  
+Both of these options are tried on four types of models: Logistic Regression, Random Forest, Gradient Boost Classifier, and AdaBoost Classifier.  The resulting model metrics on the test data are listed in the below table.  All models are run on the selected eight explanatory variables.  
 
 | Models              | Class_weight | Undersample |
 |---------------------|-------------:|------------:|
@@ -243,7 +243,7 @@ Both of these options are tried on four types of models: Logistic Regression, Ra
 |    Recall           |        0.763 |       0.900 |
 |    Accuracy         |        0.934 |       0.914 |
 
-Three model performance metrics between the two sampling options are listed: Precision, Recall and Accuracy.  For this study, we care first and foremost about the Precision metric.  That is, we don't want to predict a loan going into default when it doesn't in fact.  Ultimately, the goal of SBA loan guarantee is to assist small business owners in obtaining much needed capital. Secondly, we would also want the model to have a good overall accuracy rate after the imbalanced dataset problem is corrected.  Based on these two criteria, the class_weight option is chosen.  Amongst the model tested, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boost to identify the features of importance.   
+Three model performance metrics between the two sampling options are listed: __Precision__, __Recall__ and __Accuracy__.  For this study, we care first and foremost about the __Precision__ metric.  That is, we don't want to predict a loan going into default when it doesn't in fact.  Ultimately, the goal of SBA loan guarantee is to assist small business owners in obtaining much needed capital for growth. Secondly, we would also want the model to have a good overall accuracy rate after the imbalanced dataset problem is corrected.  Based on these two criteria, the class_weight option is chosen.  Amongst the model tested, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boost to identify the features of importance.   
 
 ### 4.2. Modeling & Comparison <a name="compare"></a>
 
@@ -253,7 +253,7 @@ With the original eight features, a Random Forest model and a Gradient Boost mod
 
 ![](images/rfc_feature_importances.png)
 
-* __Gradient Boost Model__ - Like the Random Forest model, the most important feature is 'Term', explaining almost 76% of the information gain.  In a decreasing order, the next four important features are 'U_rate', 'GrAppv', 'SBA_g', and 'SectorRisk'.  There is actually a very good overlap between the two models. Four out of the five most important features are the same.  
+* __Gradient Boost Model__ - Like the Random Forest model, the most important feature is 'Term', explaining almost 78% of the information gain.  In a decreasing order, the next four important features are 'U_rate', 'SBA_g', 'GrAppv', and 'SectorRisk'.  There is actually a very good overlap between the two models. Four out of the five most important features are the same.  
 
 ![](images/gbc_feature_importances.png)
 
@@ -261,7 +261,7 @@ The below chart shows the partial dependence plot on the first five important fe
 
 ![](images/gbc_partDepend.png)
 
-Given the feature importance study, I made a decison to further reduce the number of explanatory to five: 'Term', 'U_rate', 'GrAppv', 'SBA_g', and 'SectorRisk' and proceed with the Gradient Boost model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
+Given the feature importance study, I made a decison to further reduce the number of explanatory to five: 'Term', 'U_rate', 'SBA_g', 'GrAppv', and 'SectorRisk' and proceed with the Gradient Boost model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
 
 | Parameter        | Optimal | Gridsearch Values |
 |------------------|--------:|------------------:|
@@ -275,22 +275,26 @@ Given the feature importance study, I made a decison to further reduce the numbe
 
 ### 4.3. Final Model <a name="final"></a>
 
-A final Random Forest model with the optimal hyper-parameters and five explanatory variables are fit on the entire training dataset.  The fitted model is then used to predict the loan defaults on the holdout data set aside from the beginning (20% of overall data).  The performance metrics are listed below. 
+A final Gradient Boost model with the optimal hyper-parameters and five explanatory variables are fit on the entire training dataset.  The fitted model is then used to predict the loan defaults on the holdout data set aside from the beginning (20% of overall data).  The performance metrics are listed below. 
 
 | Gradient Boost Model|      Metrics | 
 |---------------------|-------------:|
-|    Precision        |        0.715 |
-|    Recall           |        0.913 |
-|    Accuracy         |        0.921 |
+|    Precision        |        0.842 |
+|    Recall           |        0.805 |
+|    Accuracy         |        0.939 |
 
 A final Logistic model is also fitted with the selected five explanatory variables after standardardization.  The model coefficients are as the following:
 
 | Variable    | Intercept |  Term | GrAppv | U_rate | SBA_g | SectorRisk |
 |-------------|----------:|------:|-------:|------:|-------:|-----------:|
-| Coefficient |     -0.47 | -1.61 |  0.29  | -0.25 |   0.03 |       0.29 |
+| Coefficient |     -2.37 | -1.95 |  0.19  | -0.31 |   0.02 |       0.34 |
 
-Signs on variables 'Term' and 'SectorRisk' are as expected.  Longer loan terms typically requires collaterals therefore reducing default risk.  Higher sector risk leads to higher probability that a loan will go into default.  Sign on the other three variables are counter-intuitive. We would expect higher unemployment rates to indicate tougher economic times, therefore leading to more loan defaults.  Bigger loan notional or SBA guaranteed ratio should result in lower default risks.  But many factors can affect this such as colinearity between the feature variables.  Ultimately the relationship between the loan default and explanatory variables is non-linear.
+Signs on variables 'Term' and 'SectorRisk' are as expected.  Longer loan terms typically requires collaterals therefore reducing default risk.  Higher sector risk leads to higher probability that a loan will go into default.  Sign on the other three variables are counter-intuitive. We would expect higher unemployment rates to indicate tougher economic times, therefore leading to more loan defaults.  Bigger loan notional or SBA guaranteed ratio should result in lower default risks.  But these parameters are small and many factors can affect the signs such as colinearity between the feature variables.  Ultimately the relationship between the loan default and explanatory variables is non-linear.
 
 ## 5. Conclusion <a name="result"></a>
 
-The loan default classifier was trained on the undersampled training dataset of ~277,000 loans and tested on the holdout test set of ~177,500.  The model performance has been satisfactory with 92.1% overall accuracy.  Precision rate dropped from the 90% range in the training/test set to 71.5%.  I realized at the end of day that I should have resampled the overall dataset first before taking the holdout set.  This will be done in the next round of model iteration.  Additionally I would like to try other ML models on this dataset such as the multi-level perceptron (MLP).
+The loan default classifier was trained on the training dataset of ~710,000 loans and tested on the holdout test set of ~177,500 loans.  The model performance has been satisfactory with 93.9% overall accuracy.  Precision rate dropped slightly from 84.7% in the training/test set to 84.2%.  For the hold-out set, the predicted v.s. true values are listed in the below confusion matrix:
+
+![](images/confusion_matrix.png)
+
+For further research,  I would like to try other deep learning models on this dataset such as the multi-level perceptron (MLP).
