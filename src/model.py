@@ -31,11 +31,9 @@ def compare_models(dm_lst, X_train, X_test, y_train, y_test):
         dm.print_model_metrics(X_train, X_test, y_train, y_test)
 
 
-def load_split_data(train=1):
+def load_split_data():
     """ 
         Load data in 
-    Args:
-        train(int): option to control whether all features will be used
     Returns:
         Train_test datasets for X and y, as well as a list for column names
     """
