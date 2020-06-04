@@ -33,7 +33,7 @@ if __name__ == "__main__":
     
     ### Reduce model to 5 variables: [Term, U_rate, SBA_g, GrAppv, Sector_Risk], conduct gridSearch to find the best fitting gbc model
     (X_model, X_holdout, y_model, y_holdout), col_names = load_split_data()
-    X_train, X_test, y_train, y_test = train_test_split(X_model, y_model, test_size=0.2, random_state=42, stratify=y_model)
+    # X_train, X_test, y_train, y_test = train_test_split(X_model, y_model, test_size=0.2, random_state=42, stratify=y_model)
 
     ## Fit the final gbc model with all training data and the optimized hyperparameters
     print('Fitting the final GBC model')
@@ -54,10 +54,10 @@ if __name__ == "__main__":
     ts = time()
     scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
     X_std = scaler.fit_transform(X_model)
-    lg_model = LogisticRegression(solver='lbfgs')
-    lg_model.fit(X_std, y_model)
+    lg = LogisticRegression(solver='lbfgs')
+    lg.fit(X_std, y_model)
     X_holdout_std = scaler.transform(X_holdout)
-    y_pred_lg = lg_model.predict_proba(X_holdout_std)[:,1]
+    y_pred_lg = lg.predict_proba(X_holdout_std)[:,1]
     fpr_lg, tpr_lg, _ = roc_curve(y_holdout, y_pred_lg)
     score = roc_auc_score(y_holdout, y_pred_lg)
     print('ROC AUC: %.3f' % score)
