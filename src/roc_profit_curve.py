@@ -2,61 +2,16 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from time import time
+import pickle
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix, roc_auc_score, roc_curve
 
+from src.default_modeler import DefaultModeler, undersample
 from src.model_mlp import get_weights, define_mlp_model
-
-def standard_confusion_matrix(y_true, y_pred):
-    """
-        Make confusion matrix with format:
-                  -----------
-                  | TP | FP |
-                  -----------
-                  | FN | TN |
-                  -----------
-    Args:
-        y_true : ndarray - 1D
-        y_pred : ndarray - 1D
-    Returns:
-        confusion_matrix: ndarray - 2D
-    """
-    [[tn, fp], [fn, tp]] = confusion_matrix(y_true, y_pred)
-    return np.array([[tp, fp], [fn, tn]])
-
-def profit_curve(cost_benefit, predicted_probs, targets):
-    """
-        Function to calculate list of profits based on supplied cost-benefit
-        matrix and prediced probabilities of data points and thier true labels.
-    Args:
-        cost_benefit    : ndarray - 2D, with profit values corresponding to:
-                                          -----------
-                                          | TP | FP |
-                                          -----------
-                                          | FN | TN |
-                                          -----------
-        predicted_probs : ndarray - 1D, predicted probability for each datapoint
-                                    in labels, in range [0, 1]
-        targets          : ndarray - 1D, true label of datapoints, 0 or 1
-    Returns:
-        profits    : ndarray - 1D
-        thresholds : ndarray - 1D
-    """
-    n_obs = float(len(targets))
-    # Make sure that 1 is going to be one of our thresholds
-    maybe_one = [] if 1 in predicted_probs else [1] 
-    thresholds = maybe_one + sorted(predicted_probs, reverse=True)
-    profits = []
-    for threshold in thresholds:
-        y_predict = predicted_probs >= threshold
-        confusion_matrix = standard_confusion_matrix(targets, y_predict)
-        threshold_profit = np.sum(confusion_matrix * cost_benefit) / n_obs
-        profits.append(threshold_profit)
-    return np.array(profits), np.array(thresholds)
 
 def plot_model_profits(model_profits, save_path=None):
     """
@@ -70,7 +25,7 @@ def plot_model_profits(model_profits, save_path=None):
     """
     for model, profits, _ in model_profits:
         percentages = np.linspace(0, 100, profits.shape[0])
-        plt.plot(percentages, profits, label=model.__class__.__name__)
+        plt.plot(percentages, profits, label=model)
 
     plt.title("Profit Curves")
     plt.xlabel("Percentage of test instances (decreasing by score)")
@@ -101,7 +56,7 @@ def find_best_threshold(model_profits):
             max_threshold = thresholds[max_index]
             max_profit = profits[max_index]
     return max_model, max_threshold, max_profit
-
+    
 def load_split_data():
     """ 
         Load data in 
@@ -121,49 +76,74 @@ def load_split_data():
     return (X_train, X_test, y_train, y_test), col_names
 
 if __name__ == "__main__":
-    cost_benefit = np.array([[160, -55], [0, 0]])
+    
+    ### Reduce model to 5 variables: [Term, U_rate, SBA_g, GrAppv, Sector_Risk], conduct gridSearch to find the best fitting gbc model
     (X_model, X_holdout, y_model, y_holdout), col_names = load_split_data()
     
+    cost_benefit = np.array([[160, -110], [0, 0]])
+
+    model_profits = []
+    ## Fit the final gbc model with all training data and the optimized hyperparameters
+    print('ROC for GBC model')
+    ts = time()
+    with open('static/model_gbc.pkl', 'rb') as f_gbc:
+        gbc = pickle.load(f_gbc)
+    y_pred_gbc = gbc.predict_proba(X_holdout)[:,1]
+    fpr_gbc, tpr_gbc, thresholds_gbc = roc_curve(y_holdout, y_pred_gbc)
+    profit_gbc = tpr_gbc * cost_benefit[0,0] + fpr_gbc * cost_benefit[0,1]
+    model_profits.append(('GBC', profit_gbc, thresholds_gbc))
+    score = roc_auc_score(y_holdout, y_pred_gbc)
+    print('ROC AUC: %.3f' % score)
+    te= time()
+    print("Time passed:", te-ts) 
+
+    ## Fit the final Logistic model with all training data
+    print('\nROC for LG model')
+    ts = time()
     scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
     X_std = scaler.fit_transform(X_model)
     X_holdout_std = scaler.transform(X_holdout)
-    
+    with open('static/model_lg.pkl', 'rb') as f_lg:
+        lg = pickle.load(f_lg)
+    y_pred_lg = lg.predict_proba(X_holdout_std)[:,1]
+    fpr_lg, tpr_lg, thresholds_lg = roc_curve(y_holdout, y_pred_lg)
+    profit_lg = tpr_lg * cost_benefit[0,0] + fpr_lg * cost_benefit[0,1]
+    model_profits.append(('LG', profit_lg, thresholds_lg))
+    score = roc_auc_score(y_holdout, y_pred_lg)
+    print('ROC AUC: %.3f' % score)
+    te= time()
+    print("Time passed:", te-ts) 
+
+    ## Fit the final mlp model with all training data
+    print('\nFitting the final MLP model')
+    ts = time()
     n_input = X_std.shape[1]
     weight_for_0, weight_for_1 = get_weights(y_model)
     weights ={0:weight_for_0, 1:weight_for_1}
-
-    # Define and fit the 3 competing models: gbc, lg, mlp
-    print('\nFitting the models...')
-    ts = time()
-    gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=500, random_state=2,
-                                    min_samples_leaf=50, max_depth=5, max_features=3)
-    gbc.fit(X_model, y_model)
-
-    lg = LogisticRegression(solver='lbfgs')
-    lg.fit(X_std, y_model)
-
     mlp = define_mlp_model(n_input)
     mlp.fit(X_std, y_model, epochs=30, batch_size=2048, verbose=2, class_weight=weights)
+    y_pred_mlp = mlp.predict_proba(X_holdout_std)
+    fpr_mlp, tpr_mlp, thresholds_mlp = roc_curve(y_holdout, y_pred_mlp)
+    profit_mlp = tpr_mlp * cost_benefit[0,0] + fpr_mlp * cost_benefit[0,1]
+    model_profits.append(('MLP', profit_mlp, thresholds_mlp))
+    score = roc_auc_score(y_holdout, y_pred_mlp)
+    print('ROC AUC: %.3f' % score)
     te= time()
     print("Time passed:", te-ts) 
 
-    # Calculate model_profits for each model and plot
-    print('\nCalculating model profits...')
-    ts = time()
-    models = [gbc, lg, mlp]
-    model_profits = []
-    for model in models:
-        if model == gbc: 
-            predicted_probs = model.predict_proba(X_holdout)[:, 1]
-        elif model == lg:
-            predicted_probs = model.predict_proba(X_holdout_std)[:, 1]
-        else:
-            predicted_probs = model.predict_proba(X_holdout_std)
-        profits, thresholds = profit_curve(cost_benefit, predicted_probs, y_holdout)
-        model_profits.append((model, profits, thresholds))
+    plt.figure(1)
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.plot(fpr_lg, tpr_lg, label='LR')
+    plt.plot(fpr_gbc, tpr_gbc, label='GBC')
+    plt.plot(fpr_mlp, tpr_mlp, label='MLP')
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.title('ROC curve')
+    plt.legend(loc='best')
+    plt.savefig('images/roc_curve.png')
+    plt.close()
+
     plot_model_profits(model_profits, 'images/profit_curve.png')
-    te= time()
-    print("Time passed:", te-ts) 
 
     # Find the max profit and corresponding model and threshold
     print('\nFinding the max profits...')

@@ -1,5 +1,6 @@
 import pandas as pd
 from time import time
+import pickle
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler 
@@ -75,7 +76,7 @@ if __name__ == "__main__":
     # te= time()
     # print("Time passed:", te-ts)
 
-    # # Fit final gbc model with all train data and the optimized hyperparameters
+    ## Fit final gbc model with all train data and the optimized hyperparameters
     gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=500, random_state=2,
                                     min_samples_leaf=50, max_depth=5, max_features=3)
     dm_gbc = DefaultModeler(gbc)
@@ -84,18 +85,20 @@ if __name__ == "__main__":
     print(confusion_matrix(y_holdout, y_pred))
     score = roc_auc_score(y_holdout, y_pred)
     print('ROC AUC: %.3f' % score)
-    
+    with open('static/model_gbc.pkl', 'wb') as f: pickle.dump(gbc,f)
+
     ## Fit final Logistic model with all train data and get the coefficients
-    # scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
-    # X_std = scaler.fit_transform(X_model)
-    # lg_model = LogisticRegression(solver='lbfgs')
-    # lg_model.fit(X_std, y_model)
-    # name = lg_model.__class__.__name__
-    # X_holdout_std = scaler.transform(X_holdout)
-    # y_pred = lg_model.predict(X_holdout_std)
-    # print('*'*30)
-    # print("{} Intercept:".format(name), lg_model.intercept_) 
-    # print("{} Coefficients:".format(name), lg_model.coef_)    
-    # print("{} Accuracy (test):".format(name), accuracy_score(y_holdout, y_pred))
-    # print("{} Precision (test):".format(name), precision_score(y_holdout, y_pred))
-    # print("{} Recall (test):".format(name), recall_score(y_holdout, y_pred))
+    scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
+    X_std = scaler.fit_transform(X_model)
+    lg = LogisticRegression(solver='lbfgs')
+    lg.fit(X_std, y_model)
+    name = lg.__class__.__name__
+    X_holdout_std = scaler.transform(X_holdout)
+    y_pred = lg.predict(X_holdout_std)
+    print('*'*30)
+    print("{} Intercept:".format(name), lg.intercept_) 
+    print("{} Coefficients:".format(name), lg.coef_)    
+    print("{} Accuracy (test):".format(name), accuracy_score(y_holdout, y_pred))
+    print("{} Precision (test):".format(name), precision_score(y_holdout, y_pred))
+    print("{} Recall (test):".format(name), recall_score(y_holdout, y_pred))
+    with open('static/model_lg.pkl', 'wb') as f: pickle.dump(lg,f)

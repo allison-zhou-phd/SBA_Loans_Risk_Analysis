@@ -11,6 +11,7 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.metrics import FalseNegatives, FalsePositives, TrueNegatives, TruePositives, Precision, Recall
 
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler 
 from sklearn.metrics import accuracy_score, roc_auc_score
 
 def load_split_data():
@@ -91,25 +92,30 @@ if __name__ == '__main__':
     (X_model, X_holdout, y_model, y_holdout), col_names = load_split_data()
     X_train, X_test, y_train, y_test = train_test_split(X_model, y_model, test_size=0.1, random_state=42, stratify=y_model)
     
+    scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
+    X_std = scaler.fit_transform(X_train)
+    X_test_std = scaler.transform(X_test)
+    X_holdout_std = scaler.transform(X_holdout)
+
     # Normalize the data using training set statistics
-    mean = np.mean(X_train, axis=0)
-    X_train -= mean
-    X_test -= mean
-    X_holdout -= mean
-    std = np.std(X_train, axis=0)
-    X_train /= std
-    X_test /= std
-    X_holdout /= std
+    # mean = np.mean(X_train, axis=0)
+    # X_train -= mean
+    # X_test -= mean
+    # X_holdout -= mean
+    # std = np.std(X_train, axis=0)
+    # X_train /= std
+    # X_test /= std
+    # X_holdout /= std
 
     # Building and tuning a neural network model
-    n_input = X_train.shape[1]
+    n_input = X_std.shape[1]
     weight_for_0, weight_for_1 = get_weights(y_train)
     weights ={0:weight_for_0, 1:weight_for_1}
     ts = time()
     model = define_mlp_model(n_input)
-    model.fit(X_train, y_train, epochs=30, batch_size=2048, verbose=2, 
-              validation_data=(X_test, y_test), class_weight=weights)
-    yhat = model.predict(X_holdout)
+    model.fit(X_std, y_train, epochs=30, batch_size=2048, verbose=2, 
+              validation_data=(X_test_std, y_test), class_weight=weights)
+    yhat = model.predict(X_holdout_std)
     score = roc_auc_score(y_holdout, yhat)
     print('ROC AUC: %.3f' % score)
     te= time()
