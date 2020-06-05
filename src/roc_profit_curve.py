@@ -33,6 +33,7 @@ def plot_model_profits(model_profits, save_path=None):
     plt.legend(loc='best')
     if save_path:
         plt.savefig(save_path)
+        plt.close()
     else:
         plt.show()
 
@@ -56,7 +57,7 @@ def find_best_threshold(model_profits):
             max_threshold = thresholds[max_index]
             max_profit = profits[max_index]
     return max_model, max_threshold, max_profit
-    
+
 def load_split_data():
     """ 
         Load data in 
@@ -98,7 +99,7 @@ if __name__ == "__main__":
     print("Time passed:", te-ts) 
 
     ## Fit the final Logistic model with all training data
-    print('\nROC for LG model')
+    print('\nROC for LR model')
     ts = time()
     scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
     X_std = scaler.fit_transform(X_model)
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     y_pred_lg = lg.predict_proba(X_holdout_std)[:,1]
     fpr_lg, tpr_lg, thresholds_lg = roc_curve(y_holdout, y_pred_lg)
     profit_lg = tpr_lg * cost_benefit[0,0] + fpr_lg * cost_benefit[0,1]
-    model_profits.append(('LG', profit_lg, thresholds_lg))
+    model_profits.append(('LR', profit_lg, thresholds_lg))
     score = roc_auc_score(y_holdout, y_pred_lg)
     print('ROC AUC: %.3f' % score)
     te= time()
@@ -133,8 +134,8 @@ if __name__ == "__main__":
 
     plt.figure(1)
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.plot(fpr_lg, tpr_lg, label='LR')
     plt.plot(fpr_gbc, tpr_gbc, label='GBC')
+    plt.plot(fpr_lg, tpr_lg, label='LR')
     plt.plot(fpr_mlp, tpr_mlp, label='MLP')
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
@@ -146,19 +147,19 @@ if __name__ == "__main__":
     plot_model_profits(model_profits, 'images/profit_curve.png')
 
     # Find the max profit and corresponding model and threshold
-    print('\nFinding the max profits...')
-    ts = time()
-    max_model, max_thresh, max_profit = find_best_threshold(model_profits)
-    if max_model == gbc:
-        max_labeled_positives = max_model.predict_proba(X_holdout) >= max_thresh
-    else:
-        max_labeled_positives = max_model.predict_proba(X_holdout_std) >= max_thresh
-    proportion_positives = max_labeled_positives.mean()
-    reporting_string = ('Best model:\t\t{}\n'
-                        'Best threshold:\t\t{:.2f}\n'
-                        'Resulting profit:\t{}\n'
-                        'Proportion positives:\t{:.2f}')
-    print(reporting_string.format(max_model.__class__.__name__, max_thresh,
-                                  max_profit, proportion_positives))
-    te= time()
-    print("Time passed:", te-ts) 
+    # print('\nFinding the max profits...')
+    # ts = time()
+    # max_model, max_thresh, max_profit = find_best_threshold(model_profits)
+    # if max_model == gbc:
+    #     max_labeled_positives = max_model.predict_proba(X_holdout) >= max_thresh
+    # else:
+    #     max_labeled_positives = max_model.predict_proba(X_holdout_std) >= max_thresh
+    # proportion_positives = max_labeled_positives.mean()
+    # reporting_string = ('Best model:\t\t{}\n'
+    #                     'Best threshold:\t\t{:.2f}\n'
+    #                     'Resulting profit:\t{}\n'
+    #                     'Proportion positives:\t{:.2f}')
+    # print(reporting_string.format(max_model.__class__.__name__, max_thresh,
+    #                               max_profit, proportion_positives))
+    # te= time()
+    # print("Time passed:", te-ts) 
