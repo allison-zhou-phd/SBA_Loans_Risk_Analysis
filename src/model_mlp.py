@@ -97,16 +97,6 @@ if __name__ == '__main__':
     X_test_std = scaler.transform(X_test)
     X_holdout_std = scaler.transform(X_holdout)
 
-    # Normalize the data using training set statistics
-    # mean = np.mean(X_train, axis=0)
-    # X_train -= mean
-    # X_test -= mean
-    # X_holdout -= mean
-    # std = np.std(X_train, axis=0)
-    # X_train /= std
-    # X_test /= std
-    # X_holdout /= std
-
     # Building and tuning a neural network model
     n_input = X_std.shape[1]
     weight_for_0, weight_for_1 = get_weights(y_train)
