@@ -85,7 +85,7 @@ if __name__ == "__main__":
     print(confusion_matrix(y_holdout, y_pred))
     score = roc_auc_score(y_holdout, y_pred)
     print('ROC AUC: %.3f' % score)
-    with open('static/model_gbc.pkl', 'wb') as f: pickle.dump(gbc,f)
+    #with open('static/model_gbc.pkl', 'wb') as f: pickle.dump(gbc,f)
 
     ## Fit final Logistic model with all train data and get the coefficients
     scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
@@ -101,4 +101,4 @@ if __name__ == "__main__":
     print("{} Accuracy (test):".format(name), accuracy_score(y_holdout, y_pred))
     print("{} Precision (test):".format(name), precision_score(y_holdout, y_pred))
     print("{} Recall (test):".format(name), recall_score(y_holdout, y_pred))
-    with open('static/model_lg.pkl', 'wb') as f: pickle.dump(lg,f)
+    #with open('static/model_lg.pkl', 'wb') as f: pickle.dump(lg,f)

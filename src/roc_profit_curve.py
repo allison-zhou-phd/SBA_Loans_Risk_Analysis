@@ -23,9 +23,9 @@ def plot_model_profits(model_profits, save_path=None):
     Returns:
         None
     """
-    for model, profits, _ in model_profits:
+    for model_str, _, profits, _ in model_profits:
         percentages = np.linspace(0, 100, profits.shape[0])
-        plt.plot(percentages, profits, label=model)
+        plt.plot(percentages, profits, label=model_str)
 
     plt.title("Profit Curves")
     plt.xlabel("Percentage of test instances (decreasing by score)")
@@ -50,7 +50,7 @@ def find_best_threshold(model_profits):
     max_model = None
     max_threshold = None
     max_profit = None
-    for model, profits, thresholds in model_profits:
+    for _, model, profits, thresholds in model_profits:
         max_index = np.argmax(profits)
         if not max_model or profits[max_index] > max_profit:
             max_model = model
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     ### Reduce model to 5 variables: [Term, U_rate, SBA_g, GrAppv, Sector_Risk], conduct gridSearch to find the best fitting gbc model
     (X_model, X_holdout, y_model, y_holdout), col_names = load_split_data()
     
-    cost_benefit = np.array([[160, -110], [0, 0]])
+    cost_benefit = np.array([[50000, -5000], [0, 0]])
 
     model_profits = []
     ## Fit the final gbc model with all training data and the optimized hyperparameters
@@ -89,10 +89,14 @@ if __name__ == "__main__":
     ts = time()
     with open('static/model_gbc.pkl', 'rb') as f_gbc:
         gbc = pickle.load(f_gbc)
+    # gbc = GradientBoostingClassifier(learning_rate=0.2, n_estimators=500, random_state=2,
+    #                                 min_samples_leaf=50, max_depth=5, max_features=3)
+    # dm_gbc = DefaultModeler(gbc)
+    # dm_gbc.print_model_metrics(X_model, X_holdout, y_model, y_holdout)
     y_pred_gbc = gbc.predict_proba(X_holdout)[:,1]
     fpr_gbc, tpr_gbc, thresholds_gbc = roc_curve(y_holdout, y_pred_gbc)
     profit_gbc = tpr_gbc * cost_benefit[0,0] + fpr_gbc * cost_benefit[0,1]
-    model_profits.append(('GradientBoostedClassifier', profit_gbc, thresholds_gbc))
+    model_profits.append(('GradientBoostedClassifier', gbc, profit_gbc, thresholds_gbc))
     score = roc_auc_score(y_holdout, y_pred_gbc)
     print('ROC AUC: %.3f' % score)
     te= time()
@@ -106,10 +110,12 @@ if __name__ == "__main__":
     X_holdout_std = scaler.transform(X_holdout)
     with open('static/model_lg.pkl', 'rb') as f_lg:
         lg = pickle.load(f_lg)
+    # lg = LogisticRegression(solver='lbfgs')
+    # lg.fit(X_std, y_model)
     y_pred_lg = lg.predict_proba(X_holdout_std)[:,1]
     fpr_lg, tpr_lg, thresholds_lg = roc_curve(y_holdout, y_pred_lg)
     profit_lg = tpr_lg * cost_benefit[0,0] + fpr_lg * cost_benefit[0,1]
-    model_profits.append(('LogisticRegression', profit_lg, thresholds_lg))
+    model_profits.append(('LogisticRegression', lg, profit_lg, thresholds_lg))
     score = roc_auc_score(y_holdout, y_pred_lg)
     print('ROC AUC: %.3f' % score)
     te= time()
@@ -126,7 +132,7 @@ if __name__ == "__main__":
     y_pred_mlp = mlp.predict_proba(X_holdout_std)
     fpr_mlp, tpr_mlp, thresholds_mlp = roc_curve(y_holdout, y_pred_mlp)
     profit_mlp = tpr_mlp * cost_benefit[0,0] + fpr_mlp * cost_benefit[0,1]
-    model_profits.append(('MultiLayerPerceptron', profit_mlp, thresholds_mlp))
+    model_profits.append(('MultiLayerPerceptron', mlp, profit_mlp, thresholds_mlp))
     score = roc_auc_score(y_holdout, y_pred_mlp)
     print('ROC AUC: %.3f' % score)
     te= time()
@@ -146,20 +152,20 @@ if __name__ == "__main__":
 
     plot_model_profits(model_profits, 'images/profit_curve.png')
 
-    # Find the max profit and corresponding model and threshold
-    # print('\nFinding the max profits...')
-    # ts = time()
-    # max_model, max_thresh, max_profit = find_best_threshold(model_profits)
-    # if max_model == gbc:
-    #     max_labeled_positives = max_model.predict_proba(X_holdout) >= max_thresh
-    # else:
-    #     max_labeled_positives = max_model.predict_proba(X_holdout_std) >= max_thresh
-    # proportion_positives = max_labeled_positives.mean()
-    # reporting_string = ('Best model:\t\t{}\n'
-    #                     'Best threshold:\t\t{:.2f}\n'
-    #                     'Resulting profit:\t{}\n'
-    #                     'Proportion positives:\t{:.2f}')
-    # print(reporting_string.format(max_model.__class__.__name__, max_thresh,
-    #                               max_profit, proportion_positives))
-    # te= time()
-    # print("Time passed:", te-ts) 
+    #Find the max profit and corresponding model and threshold
+    print('\nFinding the max profits...')
+    ts = time()
+    max_model, max_thresh, max_profit = find_best_threshold(model_profits)
+    if max_model == gbc:
+        max_labeled_positives = max_model.predict_proba(X_holdout) >= max_thresh
+    else:
+        max_labeled_positives = max_model.predict_proba(X_holdout_std) >= max_thresh
+    proportion_positives = max_labeled_positives.mean()
+    reporting_string = ('Best model:\t\t{}\n'
+                        'Best threshold:\t\t{:.2f}\n'
+                        'Resulting profit:\t{}\n'
+                        'Proportion positives:\t{:.2f}')
+    print(reporting_string.format(max_model.__class__.__name__, max_thresh,
+                                  max_profit, proportion_positives))
+    te= time()
+    print("Time passed:", te-ts) 
