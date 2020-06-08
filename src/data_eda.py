@@ -40,7 +40,7 @@ def heatmap_state(df, cols, legend, color='YlGn'):
     folium.LayerControl().add_to(m)
     return m
 
-def plot_default_rate(df, col, title, ascending=True, bins=25, cutoff=0):
+def plot_default_rate(df, col, title, sector_dict, ascending=True, bins=25, cutoff=0):
     """
     Plots of loan default rate by a criterion.  If a cutoff level is given, a histogram is plotted
     of the data meeting the cutoff.  Otherwise a bar plot is generated with decreasing default rates.
@@ -58,15 +58,23 @@ def plot_default_rate(df, col, title, ascending=True, bins=25, cutoff=0):
     df_grouped = df.groupby(col).agg({'LoanNr': 'count', 'Default': 'mean'})
     if cutoff==0:
         if ascending:
-            df_plot = df_grouped.sort_values('Default', ascending=ascending)[1:11]
-            ax = df_plot['Default'].plot.bar(width=0.8)
+            df_plot = df_grouped.sort_values('Default', ascending=ascending)[1:6]
+            x_labels = []
+            for i in df_plot.index:
+                x_labels.append(sector_dict[i])
+            ax = df_plot['Default'].plot.bar(width=0.7)
             ax.set_title(title)
+            ax.set_xticklabels(x_labels, rotation=45, ha='right')
             ax.set_xlabel('Sector')
             ax.set_ylabel('Default Rate')
         else:
-            df_plot = df_grouped.sort_values('Default', ascending=ascending)[0:10]
-            ax = df_plot['Default'].plot.bar(width=0.8)
+            df_plot = df_grouped.sort_values('Default', ascending=ascending)[0:5]
+            x_labels = []
+            for i in df_plot.index:
+                x_labels.append(sector_dict[i])
+            ax = df_plot['Default'].plot.bar(width=0.7)
             ax.set_title(title)
+            ax.set_xticklabels(x_labels, rotation=45, ha='right')
             ax.set_xlabel('Sector')
             ax.set_ylabel('Default Rate')
     else:
@@ -118,12 +126,39 @@ if __name__ == "__main__":
     # columns =['State', 'Default_Rate']
     # m = heatmap_state(df_state, columns, 'Default Rate (%)', 'YlGn')
 
-    plot_default_rate(df, 'Sector', "Default Rate by Sector (top 10)", ascending=False)
-    plt.savefig('images/default_sector_top10.png')
+    sector_dict = {11: 'Agri, Forest, Fishing',
+                   21: 'Mining, Oil & Gas',
+                   22: 'Utilities',
+                   23: 'Construction',
+                   31: 'Manufacturing',
+                   32: 'Manufacturing',
+                   33: 'Manufacturing',
+                   42: 'Wholesale',
+                   44: 'Retail',
+                   45: 'Retail',
+                   48: 'Transportation',
+                   49: 'Transportation',
+                   51: 'Information',
+                   52: 'Finance & Insurance',
+                   53: 'Real Estate',
+                   54: 'Professional Services',
+                   55: 'Management',
+                   56: 'Administration and Support',
+                   61: 'Education',
+                   62: 'Health Care',
+                   71: 'Arts & Entertainment',
+                   72: 'Accommodation & Food Services',
+                   81: 'Other Services',
+                   92: 'Public Administration'}
+
+    plot_default_rate(df, 'Sector', "Default Rate by Sector (top 5)", sector_dict, ascending=False)
+    plt.tight_layout()
+    plt.savefig('images/default_sector_top5.png')
     plt.close()
 
-    plot_default_rate(df, 'Sector', "Default Rate by Sector (bottom 10)", ascending=True)
-    plt.savefig('images/default_sector_bottom10.png')
+    plot_default_rate(df, 'Sector', "Default Rate by Sector (bottom 5)", sector_dict, ascending=True)
+    plt.tight_layout()
+    plt.savefig('images/default_sector_bottom5.png')
     plt.close()
 
     # plot_default_rate(df, 'Bank', "Loan Default Rate by Bank Histogram (3000+ loans)", cutoff=3000, bins=10)
