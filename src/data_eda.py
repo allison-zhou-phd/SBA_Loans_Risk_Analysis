@@ -59,14 +59,17 @@ def plot_default_rate(df, col, title, sector_dict, ascending=True, bins=25, cuto
     if cutoff==0:
         if ascending:
             df_plot = df_grouped.sort_values('Default', ascending=ascending)[1:6]
+            df_plot = df_plot.sort_values('Default', ascending=False)
             x_labels = []
             for i in df_plot.index:
                 x_labels.append(sector_dict[i])
             ax = df_plot['Default'].plot.bar(width=0.7)
             ax.set_title(title)
-            ax.set_xticklabels(x_labels, rotation=45, ha='right')
-            ax.set_xlabel('Sector')
-            ax.set_ylabel('Default Rate')
+            ax.set_xticklabels(x_labels, rotation=45, ha='right', fontsize=12)
+            ax.set_ylim(0, 0.3)
+            ax.set_xlabel('')
+            ax.set_yticklabels('')
+            #ax.set_ylabel('Default Rate')
         else:
             df_plot = df_grouped.sort_values('Default', ascending=ascending)[0:5]
             x_labels = []
@@ -74,8 +77,9 @@ def plot_default_rate(df, col, title, sector_dict, ascending=True, bins=25, cuto
                 x_labels.append(sector_dict[i])
             ax = df_plot['Default'].plot.bar(width=0.7)
             ax.set_title(title)
-            ax.set_xticklabels(x_labels, rotation=45, ha='right')
-            ax.set_xlabel('Sector')
+            ax.set_xticklabels(x_labels, rotation=45, ha='right', fontsize=12)
+            ax.set_ylim(0, 0.3)
+            ax.set_xlabel('')
             ax.set_ylabel('Default Rate')
     else:
         df_plot = df_grouped[df_grouped['LoanNr']>cutoff].sort_values('Default', ascending=False)
@@ -151,12 +155,12 @@ if __name__ == "__main__":
                    81: 'Other Services',
                    92: 'Public Administration'}
 
-    plot_default_rate(df, 'Sector', "Default Rate by Sector (top 5)", sector_dict, ascending=False)
+    plot_default_rate(df, 'Sector', "Sectors Most Likely to Default", sector_dict, ascending=False)
     plt.tight_layout()
     plt.savefig('images/default_sector_top5.png')
     plt.close()
 
-    plot_default_rate(df, 'Sector', "Default Rate by Sector (bottom 5)", sector_dict, ascending=True)
+    plot_default_rate(df, 'Sector', "Sectors Least Likely to Default", sector_dict, ascending=True)
     plt.tight_layout()
     plt.savefig('images/default_sector_bottom5.png')
     plt.close()

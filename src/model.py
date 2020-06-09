@@ -82,15 +82,16 @@ if __name__ == "__main__":
     compare_models(dm_lst, X_train, X_test, y_train, y_test)
   
     ### Plot feature importance and partial dependence
-    dm_rfc.plot_feature_importance(X_train, col_names)
+    col_labels = np.array(['State Risk', 'Sector Risk', 'Term', 'Number of Employees', 'Low Document', 'Loan Amt', 'SBA Guarantee Ratio', 'Unemployment Rate'])
+    dm_rfc.plot_feature_importance(X_train, col_labels)
     plt.savefig('images/rfc_feature_importances.png')
     plt.close()
-    dm_gbc.plot_feature_importance(X_train, col_names)
+    dm_gbc.plot_feature_importance(X_train, col_labels)
     plt.savefig('images/gbc_feature_importances.png')
     plt.close()
 
-    features = [2, 7, 5, 6, 1]
-    plot_partial_dependence(gbc, X_train, features=features, feature_names=col_names) 
+    features = [2, 7, 6, 5, 1]
+    plot_partial_dependence(gbc, X_train, features=features, feature_names=col_labels) 
     fig = plt.gcf()
     fig.set_size_inches(11,8)
     plt.tight_layout()
