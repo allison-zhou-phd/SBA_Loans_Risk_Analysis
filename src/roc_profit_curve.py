@@ -30,7 +30,7 @@ def plot_model_profits(model_profits, save_path=None):
         percentages = np.linspace(0, 100, profits.shape[0])
         ax.plot(percentages, profits, label=model_str)
 
-    ax.set_title("Profit Curves")
+    ax.set_title("Profit Curve")
     ax.set_xlabel("Percentage of test instances (decreasing by score)", fontsize=12)
     ax.set_ylabel("Profit ($)", fontsize=12)
     ax.get_yaxis().set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     # te= time()
     # print("Time passed:", te-ts) 
 
-    # # Fit the final mlp model with all training data
+    # ## Fit the final mlp model with all training data
     # print('\nMLP model')
     # ts = time()
     # mlp = load_model("static/model_mlp.h5")
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     # plt.plot(fpr_mlp, tpr_mlp, label='MultiLayerPerceptron')
     # plt.xlabel('False positive rate')
     # plt.ylabel('True positive rate')
-    # plt.title('ROC curve')
+    # plt.title('ROC Curve')
     # plt.legend(loc='best')
     # plt.savefig('images/roc_curve.png')
     # plt.close()

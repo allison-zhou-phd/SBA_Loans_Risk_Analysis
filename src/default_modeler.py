@@ -47,7 +47,7 @@ class DefaultModeler(object):
         indices = np.argsort(importances)[::-1]
         name = self.model.__class__.__name__.replace('Classifier','')
         plt.bar(range(X.shape[1]), importances[indices], color="b")
-        plt.title("{} Feature importances".format(name))
+        plt.title("{} Feature Importances".format(name))
         plt.xlabel("Feature")
         plt.ylabel("Feature importance")
         plt.xticks(range(X.shape[1]), col_names[indices], rotation=45, fontsize=12, ha='right')
