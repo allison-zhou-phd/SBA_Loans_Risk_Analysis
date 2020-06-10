@@ -73,10 +73,12 @@ def define_mlp_model(n_input):
     return model
 
 if __name__ == '__main__':
+
+    ### Load data with final 5 variables: [Term, U_rate, SBA_g, GrAppv, Sector_Risk]
     (X_model, X_holdout, y_model, y_holdout), col_names = load_split_data(select=1)
     X_train, X_test, y_train, y_test = train_test_split(X_model, y_model, test_size=0.1, random_state=42, stratify=y_model)
     
-    ### Standardize features
+    ### Standardize feature variables
     scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
     X_std = scaler.fit_transform(X_train)
     X_test_std = scaler.transform(X_test)
@@ -97,6 +99,7 @@ if __name__ == '__main__':
     print('ROC AUC: %.3f' % score)
     print("Time passed:", te-ts)
 
+    ### Save model
     save_model = 0
     if save_model:
         model.save("static/model_mlp.h5") 

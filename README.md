@@ -11,8 +11,8 @@
    5. [Loan Characteristics](#loan)
 4. [Sampling, Modeling & Comparison](#model)
    1. [Balancing Classes](#sample)
-   2. [Modeling & Comparison](#compare)
-   3. [Multi-layer Perceptron](#mlp)
+   2. [Ensemble Models](#gbc)
+   3. [Multi-layer Perceptron (MLP) Model](#mlp)
    4. [Profit Curve](#profit)
    5. [Final Model](#final)
 5. [Conclusion](#result)
@@ -252,7 +252,7 @@ Both of these options are tried on four types of models: Logistic Regression, Ra
 
 Three model performance metrics between the two sampling options are listed: __Precision__, __Recall__ and __Accuracy__.  For this study, we care first and foremost about the __Precision__ metric.  That is, we don't want to predict a loan going into default when it doesn't in fact.  Ultimately, the goal of SBA loan guarantee is to assist small business owners in obtaining much needed capital for growth. Secondly, we would also want the model to have a good overall accuracy rate after the imbalanced dataset problem is corrected.  Based on these two criteria, the class_weight option is chosen.  Amongst the model tested, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boosting to identify the features of importance.   
 
-### 4.2. Modeling & Comparison <a name="compare"></a>
+### 4.2. Ensemble Models <a name="gbc"></a>
 
 With the original eight features, a Random Forest model and a Gradient Boosting model are fitted separately while setting the class_weight option to balanced.  The goal is see if both models will identify the same set of important features.
 
@@ -311,3 +311,5 @@ For further research,  I would like to try other deep learning models on this da
 
 ## 6. Citation <a name="cite"></a>
 * [Small Business Administration (SBA)](https://www.sba.gov/)
+* [Wells Fargo SBA Lending](https://www.wellsfargo.com/biz/sba/)
+* [Should This Loan be Approved or Denied? A large and rich dataset from the U.S. Small Business Administration (SBA)](https://www.kaggle.com/mirbektoktogaraev/should-this-loan-be-approved-or-denied)
