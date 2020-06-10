@@ -144,19 +144,19 @@ The SBA dataset contains some business characteristics that might be influential
 
 * __Franchised__ - similar to the new business consideration, one might argue that business with a franchised model might have a lower risk to default on loans.  This is because franchised businesses tend to have established business plans, target clientiles, smoothed supply chains, etc.  Yet the calculated data indicates non-franchised businesses only have marginally higher default rates than their franchised couterparts.
 
-|              | Franchise | Non-Franchise |
-|--------------|----------:|--------------:|
-| Default Rate |    15.16% |        17.68% |
+    |              | Franchise | Non-Franchise |
+    |--------------|----------:|--------------:|
+    | Default Rate |    15.16% |        17.68% |
 
 * __Number of Employees__ - below is a quartile table of comparison. It seems that Non-default loans have slightly more employees.  Perhaps bigger in size? 
 
-| Quartiles    | Default | Non-Default |
-|--------------|--------:|------------:|
-| 100% maximum |    9999 |        9999 |
-| 75% quartile |       7 |          11 |
-| 50% median   |       3 |           5 |
-| 25% quartile |       2 |           2 |
-| Minimum      |       0 |           0 |
+    | Quartiles    | Default | Non-Default |
+    |--------------|--------:|------------:|
+    | 100% maximum |    9999 |        9999 |
+    | 75% quartile |       7 |          11 |
+    | 50% median   |       3 |           5 |
+    | 25% quartile |       2 |           2 |
+    | Minimum      |       0 |           0 |
 
 ### 3.5. Loan Characteristics <a name="loan"></a>
 
@@ -164,13 +164,13 @@ The rest of variables relate more to the loan characteristics. Below are some co
 
 * __Loan Gross Disbursement__ - Non-default loans seem to have higher notional amounts.
 
-| Quartiles    |    Default | Non-Default |
-|--------------|-----------:|------------:|
-| 100% maximum | $4,362,157 | $11,446,325 |
-| 75% quartile |   $140,417 |    $256,686 |
-| 50% median   |    $62,000 |    $100,000 |
-| 25% quartile |    $28,055 |     $49,000 |
-| Minimum      |     $4,000 |      $4,000 |
+    | Quartiles    |    Default | Non-Default |
+    |--------------|-----------:|------------:|
+    | 100% maximum | $4,362,157 | $11,446,325 |
+    | 75% quartile |   $140,417 |    $256,686 |
+    | 50% median   |    $62,000 |    $100,000 |
+    | 25% quartile |    $28,055 |     $49,000 |
+    | Minimum      |     $4,000 |      $4,000 |
 
 * __Loan Term (months)__ - Non-default loans seem to be considerably longer in term. 
 
