@@ -10,10 +10,13 @@
    4. [Business Characteristics](#business)
    5. [Loan Characteristics](#loan)
 4. [Sampling, Modeling & Comparison](#model)
-   1. [Sampling](#sample)
+   1. [Balancing Classes](#sample)
    2. [Modeling & Comparison](#compare)
-   3. [Final Model](#final)
+   3. [Multi-layer Perceptron](#mlp)
+   4. [Profit Curve](#profit)
+   5. [Final Model](#final)
 5. [Conclusion](#result)
+6. [Citation](#cite)
 
 
 ## 1. Background & Motivation <a name="background"></a>
@@ -216,7 +219,7 @@ For StateRisk and SectorRisk, additional feature engineering is performed to con
 
 The ultimate goal of this study is to identify a model that has good predictive power in loan defaults.  This section details the steps taken in exploring different models, the performance comparison, and the final model selection.  
 
-### 4.1. Sampling <a name="sample"></a>
+### 4.1. Balancing Classes <a name="sample"></a>
 
 Before hopping into the modeling topic, there is one last decison to be made about the dataset.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has nine attributes with the 9th being the target - whether the loan defaulted or not.  The rest eight features are the explanatory variables. A deeper look at the data reveals that the two classes (default v.s. non-default) are not balanced.  The minority class (default, which is also the event we try to identify) takes about 17.6% of the 887,382 observations.  
 
@@ -276,8 +279,11 @@ Given the feature importance study, I made a decison to further reduce the numbe
  | n_estimators     |     500 |        [300, 500] |
  | random_state     |       2 |                 2 |
 
+### 4.3. Multi-layer Perceptron (MLP) Model <a name="mlp"></a>
 
-### 4.3. Final Model <a name="final"></a>
+### 4.4. Profit Curve <a name="profit"></a>
+
+### 4.5. Final Model <a name="final"></a>
 
 A final Gradient Boosting model with the optimal hyper-parameters and five explanatory variables are fit on the entire training dataset.  The fitted model is then used to predict the loan defaults on the holdout data set aside from the beginning (20% of overall data).  The performance metrics are listed below. 
 
@@ -302,3 +308,6 @@ The loan default classifier was trained on the training dataset of ~710,000 loan
 ![](images/confusion_matrix.png)
 
 For further research,  I would like to try other deep learning models on this dataset such as the multi-level perceptron (MLP).
+
+## 6. Citation <a name="cite"></a>
+* [Small Business Administration (SBA)](https://www.sba.gov/)
