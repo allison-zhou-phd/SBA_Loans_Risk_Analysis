@@ -22,11 +22,13 @@ The U.S. Small Business Administration (SBA) is a United States government agenc
 
 One way the SBA provides assistance to small businesses is to provide easier access to the capital market and funding.  The agency doesn't extend loans directly.  Instead, it offers a loan guarantee program that is designed to encourage banks to grant commercial loans to small businesses.  In this regard, SMA acts much like an insurance provider to mitigate the risks for banks by shouldering some of the default risks.  Because SBA only guarantees a portion of the entire loan amount, banks who grant the loan will incur some losses if a small business defaults on its SBA-guaranteed loan.  As such, banks still need to evaluate the loan application and decide if they should grant it or not. 
 
-We are in the middle of the pandemic Covid-19.  It has brought sudden and significant threats not only to human health but also to normal economic operations when people stay at home to "flatten the curve".  Many small businesses are suffering.  On April 21, 2020, the U.S. Senate approved a $484 billion coronavirus relief package that would provide loans to distressed small businesses.  These loans are administered by commercial banks as the "Paycheck Protection Program (PPP) loans".  In this study, I would like to build models on historical SBA guaranteed loans data.  My goal is to identify the key risk factors that differentiate high-risk loans (resulting in default) from low-risk loans (with full repayments). 
+We are in the midst of the pandemic Covid-19.  It has brought sudden and significant threats not only to human health but also to normal economic operations when people stay at home to "flatten the curve".  Many small businesses are suffering.  The Coronavirus Aid, Relief, and Economic Secuirty (CARES) Act was passed by Congress and signed into law by the president on March 27, 2020.  The core of CARES Act is to provide loans to small business owners in maintaining payroll.  The initial tranche of $349 billion in funding was quickly exghausted in merely 13 days.  A second tranche of $310 billion was added on April 23, 2020.  As of June 6, more than 4.42 million loans worth roughly $510 billion had been distributed through the program, leaving roughly $100 billion remaining in the fund. PPP loans are forgiveable if used within guidance. 
+
+This made me wonder - how did SBA loans perform historically?  Some initial investigation shows that one in six SBA guaranteed commercial loans actually ended up in default.  In this study, I would like to research what factors are primary in predicting if a loan will go into default.  I would also like to build a model that has good forecasting capabilities on unseen data.  
 
 ## 2. Data <a name="data"></a>
 
-I found the dataset on kaggle.com, though it originally came from the U.S. SBA.  It contains historical data from 1968 to mid-2014 (899,164 observations in total).  The variable name, the data type and a brief description of each variable is found in the below table:
+I found the dataset on kaggle.com, though the origin is the U.S. SBA office.  It contains historical SBA loan data from 1968 to mid-2014 (899,164 observations in total).  The variable name, the data type and a brief description of each variable is found in the table below:
 
 
 | Variable name     | Data type | Description of variable                               |
@@ -88,7 +90,7 @@ The following actions are taken to transform the data:
 
 * __ApprovalFY__: In the original data set, there are 18 observations with ApprovalFY='1976A'.  I am not able to find what the 'A' indicates.  I choose to convert these values to 1976, thereby collapsing the 18 data points to be with ApprovalFY='1976'.
 
-* __Franchise__: The original data set has mixed entry for this variable.  Entries '0000' and '0001' indicate there is no franchise. Franchise codes are entered wherever franchises are involved.  I choose to convert this variable to a Boolean type with 0 indicating no franchise and 1 otherwise. 
+* __Franchise__: The original data set has mixed entries for this variable.  Entries '0000' and '0001' indicate there is no franchise. Franchise codes are entered wherever franchises are involved.  I choose to convert this variable to a Boolean type with 0 indicating no franchise and 1 otherwise. 
 
 * __NewExist__ (1=Existing Business, 2=New Business): I choose to convert this variable to a Boolean type variable __NewBiz__ with 0 indicating existing business and 1 new business. 
 
@@ -96,7 +98,7 @@ The following actions are taken to transform the data:
 
 * __MIS_Status__: This is the target variable that we are interested in.  I choose to convert the variable to a Boolean type variable __Default__ where 1=CHGOFF and 0=PIF. 
 
-* __Currency_Variables__:  The original data variables with type = 'Currency' are formated in the accounting convention with "$" and "," separators. These are converted to the float data type. 
+* __Currency_Variables__:  The original data variables with type = 'Currency' are formatted in the accounting convention with "$" and "," separators. These are converted to the float data type. 
 
 * __SBA Guaranteed Portion__:  The original dataset contains the gross loan amount and the SBA guaranteed amount.  I choose to divide the latter by the former to obtain a new variable __SBA_g__ which is the percent of loan that is guanranteed by SBA.  It is a variable with values between 0 and 1.
 
@@ -106,25 +108,25 @@ The following actions are taken to transform the data:
 
 ## 3. EDA & Feature Engineering <a name="eda"></a>
 
-Which explanatory variables may be good predicators of whether a loan will go into default or not?  This section uses data exploratory analysis to investigate and gather useful features for the predicative model.  
+Which explanatory variables may be good predicators of whether a loan will go into default?  This section uses data exploratory analysis to investigate and gather useful features for the predicative model.  
 
 ### 3.1. Location (State) <a name="state"></a>
 
-Location (in this case State) can be a possible indicator for potential loan risk.  The 50 states and Washington DC have different economic environments and industry concentration, therefore leading to different default rates.  As shown by the heat map below, loan default rates definitely vary across states with Florida leading the pack at around 27.4%.  This could be explained by Florida suffering more from the boom and bust of real estate cycles, as well as more natural disaters like hurricanes.  In contrast, western states like Montana and Wyoming have lower loan default rates (in the 6% range).  This could be explained by the fact that these states traditionally relies on the oil and mineral industries which were more or less stable during the sample periods.     
+Location (in this case State) can be a possible indicator for potential loan risk.  The 50 states and Washington DC have different economic environments and industry concentration, therefore leading to different default rates.  As shown by the heat map below, loan default rates definitely vary across states with Florida leading the pack at around 27.4% SBA loan defaults.  This could be explained by Florida suffering more from the boom and bust of real estate cycles, as well as more natural disaters like hurricanes.  In contrast, western states like Montana and Wyoming have lower loan default rates (in the 6% range).  This could be explained by the fact that these states traditionally relies on the oil and mineral industries which were more or less stable during the sample periods.     
 
 ![](images/default_state.png)
 
 ### 3.2. Sector <a name="sector"></a>
 
-The below bar charts list the top 10 highest and bottom 10 lowest loan defaults by sectors.  Cross-referencing the sector NAICS table above, we can see that __sector 53__ is "Real estate and rental and leasing".  Real estate secotor is pro-cyclical and tends to overshoot in both economic booms and busts.  Since 1980, the United States has experienced at least two big real-estate led economic cycles, the most recent being the 2008-2009 financial crisis.  On the other side of the spectrum, __sector 21__ (Mining, quarring, and oil and gas extraction), __sector 11__ (Agriculture, forestry, fishing and hunting), __sector 55__ (Management), and __sector 62__ (Health care and social assistance) suffer from lower loan default risks (in the 10% and under range) either because the sector is acyclical or hasn't experienced significant downward price adjustments.  (The same cannot be said about oil and gas industry in the Covid-19 Crisis, though the cause is not the virus alone.) 
+The below bar charts list the top five highest and bottom five lowest loan defaults by sectors.  It is clear that real estate sector has the highest SBA loan default rate at about 28%.  Real estate secotor is pro-cyclical and tends to overshoot in both economic booms and busts.  Since 1980, the United States has experienced at least two big real-estate led economic cycles, the most recent being the 2008-2009 financial crisis.  On the other side of the spectrum, sectors like "Mining, quarring, and oil and gas extraction" and "Agriculture, forestry, fishing and hunting" suffer from low loan default risks (in the 10% and under range) either because the sectors are acyclical or haven't experienced significant downward price adjustments.  (The same cannot be said about oil and gas industry in the Covid-19 Crisis, though the cause is not the virus alone.) 
 
-![](images/default_sector_top10.png)
+![](images/default_sector_top5_readme.png)
 
-![](images/default_sector_bottom10.png)
+![](images/default_sector_bottom5_readme.png)
 
 ### 3.3. Bank (Lender) <a name="bank"></a>
 
-Banking is an industry with high regulations.  Typically commercial banks have long established guidance to assess loan risks.  Therefore we wouldn't expect the commercial bank or the specific state that the bank resides in has any impact on the loan default rates, unless the bank is not following the regulatory rules.  Since there are many banking/credit union entities in the data set, most of which issue less than 1000 loans.  I choose to plot two histograms of all banks extending 1000+ or 3000+ loans (see below charts).  As expected, we can't make the association that banks with more loans issued have lower / higher default rates.   
+Banking is an industry with high regulations.  Typically commercial banks have long established guidance to assess loan risks.  Therefore we wouldn't expect the commercial bank or the specific state that the bank resides in to have any impact on the loan default rates, unless the bank is not following the regulatory rules.  Because there are many banking/credit union entities in the data set, most of which issue less than 1000 loans.  I choose to plot two histograms of all banks extending 1000+ or 3000+ loans (see below charts).  As expected, we can't make the association that banks with more loans issued have lower / higher default rates.   
 
 ![](images/default_bank_3000.png)
 
@@ -133,11 +135,12 @@ Banking is an industry with high regulations.  Typically commercial banks have l
 ### 3.4. Business Characteristics <a name="business"></a>
 
 The SBA dataset contains some business characteristics that might be influential in the performance of loans.  Specifically, 
+
 * __New business__ - the assumption is that established business have a proven record of success with longer-term customers, operation workflow, etc.  In contrast new businesses are unproven and might not weather economic ups and downs as well.  However, calculated data indicates otherwise:
 
-|              | New Biz | Established Biz |
-|--------------|--------:|----------------:|
-| Default Rate |  18.60% |          17.11% |
+    |              | New Biz | Established Biz |
+    |--------------|--------:|----------------:|
+    | Default Rate |  18.60% |          17.11% |
 
 * __Franchised__ - similar to the new business consideration, one might argue that business with a franchised model might have a lower risk to default on loans.  This is because franchised businesses tend to have established business plans, target clientiles, smoothed supply chains, etc.  Yet the calculated data indicates non-franchised businesses only have marginally higher default rates than their franchised couterparts.
 
