@@ -59,6 +59,7 @@ def fix_date_year(df, col_1, col_2):
 
 if __name__ == "__main__":
 
+    ### Read in raw data from csv and perform cleaning
     df = pd.read_csv('data/SBAnational.csv', parse_dates=['ApprovalDate','ApprovalFY'])
     df['Sector'] = [int(str(x)[:2]) for x in df['NAICS']]
     df.loc[df['ApprovalFY']=='1976A','ApprovalFY']='1976'
@@ -76,7 +77,7 @@ if __name__ == "__main__":
     df_loan = fix_date_year(df_loan, 'ApprovalDate', 'ApprovalFY')
     df_loan = df_loan.dropna()
 
-    # read in the monthly unemployment data and merge with the the loan data on the same year/month
+    ### Read in the monthly unemployment data and merge with the the loan data on the same year/month
     us_unemploy = pd.read_csv('data/us_unemployment.csv', index_col=0)
     ur = us_unemploy.values.reshape(-1,1)[:-8]
     date_range = pd.date_range('1965-01','2020-05', freq='M')

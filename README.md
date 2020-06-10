@@ -174,77 +174,78 @@ The rest of variables relate more to the loan characteristics. Below are some co
 
 * __Loan Term (months)__ - Non-default loans seem to be considerably longer in term. 
 
-| Quartiles    | Default | Non-Default |
-|--------------|--------:|------------:|
-| 100% maximum |     461 |         569 |
-| 75% quartile |      68 |         180 |
-| 50% median   |      49 |          84 |
-| 25% quartile |      29 |          78 |
-| Minimum      |       0 |           0 |
+    | Quartiles    | Default | Non-Default |
+    |--------------|--------:|------------:|
+    | 100% maximum |     461 |         569 |
+    | 75% quartile |      68 |         180 |
+    | 50% median   |      49 |          84 |
+    | 25% quartile |      29 |          78 |
+    | Minimum      |       0 |           0 |
 
 * __SBA Guarantee Portion (%)__ - Non-default loans seem to have higher percentage of SBA guarantee, especially for the top 50% percentile.
 
-| Quartiles    | Default | Non-Default |
-|--------------|--------:|------------:|
-| 100% maximum |     100 |         100 |
-| 75% quartile |      82 |          85 |
-| 50% median   |      50 |          75 |
-| 25% quartile |      50 |          50 |
-| Minimum      |      12 |         2.8 |
+    | Quartiles    | Default | Non-Default |
+    |--------------|--------:|------------:|
+    | 100% maximum |     100 |         100 |
+    | 75% quartile |      82 |          85 |
+    | 50% median   |      50 |          75 |
+    | 25% quartile |      50 |          50 |
+    | Minimum      |      12 |         2.8 |
 
-__Default_by_LowDocu__ - Counter-intuitively, loans with less documentation actually have lower default rate. 
-|              | LowDocu   | Non-LowDocu   |
-|--------------|----------:|--------------:|
-| Default Rate |    9.00%  |        18.74% |
+* __Default_by_LowDocu__ - Counter-intuitively, loans with less documentation actually have lower default rate. 
 
-Based on these data exploration, we can draw initial conclusions that loans with higher gross disbursement dollar amounts, longer loan terms and higher SBA guarantee ratios tend to have lower default risk.  This could be explained by that businesses getting these types of loans are more established in nature, bigger in operation sizes, and/or have other collaterals posted(e.g. real estates).
+    |              | LowDocu   | Non-LowDocu   |
+    |--------------|----------:|--------------:|
+    | Default Rate |    9.00%  |        18.74% |
+
+Based on these data exploration, we can draw initial conclusions that loans with higher gross dollar amounts, longer loan terms and higher SBA guarantee ratios tend to have lower default risk.  This could be explained by that businesses getting these types of loans are more established in nature, bigger in operation size, and/or have other collaterals posted(e.g. real estates).
 
 With the initial data EDA, I made the choice to select the following variables to model loan default risk: 
 * StateRisk
 * SectorRisk
 * LoanTerm(Term)
 * Number of Employees(NumEmp)
-* LowDocu
+* Low Document (LowDocu)
 * Gross_Approval_Amt(GrAppv)
 * SBA_Guaranteed_Ratio(SBA_g)
 * Unemployment(U_rate)  
 
-For StateRisk and SectorRisk, additional bucketing is done to convert the variables into numeric values.  For StateRisk, any state with a default rate higher than 18%(inclusive) is categorized as high risk (value=2). States with default rate between 10%(inclusive) and 18%(exclusive) are rated 1 and those with default rate lower than 10%(exclusive) are rated 0.  For SectorRisk, ratings are similarly chosen amongst 2, 1, and 0, with the cutoff levels at 20% and 10% respectively. 
+For StateRisk and SectorRisk, additional feature engineering is performed to convert the variables into numeric values.  For StateRisk, any state with a default rate higher than 18%(inclusive) is categorized as high risk (value=2). States with default rate between 10%(inclusive) and 18%(exclusive) are rated 1 and those with default rate lower than 10%(exclusive) are rated 0.  For SectorRisk, ratings are similarly chosen amongst 2, 1, and 0, with the cutoff levels at 20% and 10% respectively. 
 
 ## 4. Sampling, Modeling & Comparison <a name="model"></a>
 
-The ultimate goal of this study is to identify a model that has good predictive power in loan defaults.  This section details the steps taken in fitting various models, the performance comparison, and the final model selection.  
+The ultimate goal of this study is to identify a model that has good predictive power in loan defaults.  This section details the steps taken in exploring different models, the performance comparison, and the final model selection.  
 
 ### 4.1. Sampling <a name="sample"></a>
 
-Before hopping into the modeling topic, there is one last decison to be made about the dataset.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has nine attributes with the 9th being the model target - whether the loan defaulted or not.  The rest eight features are the explanatory variables. A deeper look at the data reveals that the two classes (default/non-default) are not balanced.  The minority class (default, which is also the event we try to identify) takes about 20% of the 887,382 observations.  
+Before hopping into the modeling topic, there is one last decison to be made about the dataset.  The data cleaning and feature engineering conducted in the previous two sections result in a loan dataset that has 887,382 observations.  Each observation has nine attributes with the 9th being the target - whether the loan defaulted or not.  The rest eight features are the explanatory variables. A deeper look at the data reveals that the two classes (default v.s. non-default) are not balanced.  The minority class (default, which is also the event we try to identify) takes about 17.6% of the 887,382 observations.  
 
-To solve the imbalanced classes problem, two options are considered in the study:
+To solve the imbalanced classes problem, two options are evaluated in the study:
 
-* Use the "class_weight" option that is built in some of the scikit-learn models.  Setting this option to "balanced" results in an automatic weights adjustment by the inverse of class frequencies. 
+* Use the "class_weight" option that is built in some of the models.  Setting this option to "balanced" results in an automatic weights adjustment by the inverse of class frequencies. 
 
-* Perform resampling to balance the dataset before feeding the data to the model.  Because I have enough data points for both the minority and majority classes, I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class. After undersampling is performed, I have a dataset of 276,579 observations. 
+* Perform resampling to balance the dataset before feeding the data to the model.  Because there is enough data points for both the minority and majority classes, I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class. After undersampling is performed, I have a dataset of 276,579 observations. 
 
 Both of these options are tried on four types of models: Logistic Regression, Random Forest, Gradient Boost Classifier, and AdaBoost Classifier.  The resulting model metrics on the test data are listed in the below table.  All models are run on the selected eight explanatory variables.  
 
-| Models              | Class_weight | Undersample |
-|---------------------|-------------:|------------:|
-| __Logistic Regression__ |              |             |
-|    Precision        |        0.367 |       0.369 |
-|    Recall           |        0.071 |       0.056 |
-|    Accuracy         |        0.816 |       0.818 |
-| __Random Forest__       |              |             |
-|    Precision        |        0.836 |       0.770 |
-|    Recall           |        0.746 |       0.994 |
-|    Accuracy         |        0.930 |       0.947 |
-| __Gradient Boost__      |              |             |
-|    Precision        |        0.847 |       0.704 |
-|    Recall           |        0.771 |       0.904 |
-|    Accuracy         |        0.935 |       0.917 |
-| __Ada Boost__           |              |             |
-|    Precision        |        0.848 |       0.697 |
-|    Recall           |        0.763 |       0.900 |
-|    Accuracy         |        0.934 |       0.914 |
+    | Models              | Class_weight | Undersample |
+    |---------------------|-------------:|------------:|
+    | __Logistic Regression__ |              |             |
+    |    Precision        |        0.367 |       0.369 |
+    |    Recall           |        0.071 |       0.056 |
+    |    Accuracy         |        0.816 |       0.818 |
+    | __Random Forest__       |              |             |
+    |    Precision        |        0.836 |       0.770 |
+    |    Recall           |        0.746 |       0.994 |
+    |    Accuracy         |        0.930 |       0.947 |
+    | __Gradient Boost__      |              |             |
+    |    Precision        |        0.847 |       0.704 |
+    |    Recall           |        0.771 |       0.904 |
+    |    Accuracy         |        0.935 |       0.917 |
+    | __Ada Boost__           |              |             |
+    |    Precision        |        0.848 |       0.697 |
+    |    Recall           |        0.763 |       0.900 |
+    |    Accuracy         |        0.934 |       0.914 |
 
 Three model performance metrics between the two sampling options are listed: __Precision__, __Recall__ and __Accuracy__.  For this study, we care first and foremost about the __Precision__ metric.  That is, we don't want to predict a loan going into default when it doesn't in fact.  Ultimately, the goal of SBA loan guarantee is to assist small business owners in obtaining much needed capital for growth. Secondly, we would also want the model to have a good overall accuracy rate after the imbalanced dataset problem is corrected.  Based on these two criteria, the class_weight option is chosen.  Amongst the model tested, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boost to identify the features of importance.   
 
@@ -252,11 +253,11 @@ Three model performance metrics between the two sampling options are listed: __P
 
 With the original eight features, a Random Forest model and a Gradient Boost model are fitted separately while setting the class_weight option to balanced.  The goal is see if both models will identify the same set of important features.
 
-* __Random Forest Model__ - as the below chart indicates, the most imoportant feature in predicting loan default risk is loan term ('Term'), explaining about 58% of the information gain.  This is followed by gross loan amount ('GrAppv'), the unemployment rate ('U_rate'), number of employees(NumEmp), and SBA guaranteed percent('SBA_g'). 
+* __Random Forest Model__ - as the below chart indicates, the most imoportant feature in predicting loan default risk is the loan term, explaining about 58% of the information gain.  This is followed by the gross loan amount, the unemployment rate, the number of employees, and SBA guaranteed ratio. 
 
 ![](images/rfc_feature_importances.png)
 
-* __Gradient Boost Model__ - Like the Random Forest model, the most important feature is 'Term', explaining almost 78% of the information gain.  In a decreasing order, the next four important features are 'U_rate', 'SBA_g', 'GrAppv', and 'SectorRisk'.  There is actually a very good overlap between the two models. Four out of the five most important features are the same.  
+* __Gradient Boost Model__ - Like the Random Forest model, the most important feature is the loan term, explaining almost 78% of the information gain.  In a decreasing order, the next four important features are the unemployment rate, the SBA guaranteed ratio, the gross loan amount, and the sector risk.  There is actually a very good overlap between the two models. Four out of the five most important features are the same.  
 
 ![](images/gbc_feature_importances.png)
 
@@ -264,7 +265,7 @@ The below chart shows the partial dependence plot on the first five important fe
 
 ![](images/gbc_partDepend.png)
 
-Given the feature importance study, I made a decison to further reduce the number of explanatory to five: 'Term', 'U_rate', 'SBA_g', 'GrAppv', and 'SectorRisk' and proceed with the Gradient Boost model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
+Given the feature importance study, I made a decison to further reduce the number of explanatory to five: the loan term('Term'), the unemployment rate ('U_rate'), the SBA guanranteed ratio ('SBA_g'), the gross loan amount ('GrAppv'), and the sector risk ('SectorRisk') and proceed with the Gradient Boost model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
 
 | Parameter        | Optimal | Gridsearch Values |
 |------------------|--------:|------------------:|

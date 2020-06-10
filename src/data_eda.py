@@ -110,6 +110,7 @@ def plot_pca_explained_var(ax, pca):
 
 if __name__ == "__main__":
 
+    ### Plot unemployment rate
     unemployment = 0
     if unemployment:
         us_unemploy = pd.read_csv('data/us_unemployment.csv', index_col=0)
@@ -128,12 +129,14 @@ if __name__ == "__main__":
     df = pd.read_pickle('data/pickled_loan')
     df.drop(['grouper','Date'], axis=1, inplace=True)
 
+    ### Plot loan default rates by states
     state = 0
     if state:
         df_state = df.groupby('State').mean()['Default']*100
         columns =['State', 'Default_Rate']
         m = heatmap_state(df_state, columns, 'Default Rate (%)', 'YlGn')
 
+    ### Plot loan default rates by sectors
     sector = 1
     if sector:
         sector_dict = {11: 'Agri, Forest, Fishing',
@@ -171,6 +174,7 @@ if __name__ == "__main__":
         plt.savefig('images/default_sector_bottom5_readme.png')
         plt.close()
 
+    ### Plot loan default rates by banks
     bank = 0
     if bank:
         plot_default_rate(df, 'Bank', "Loan Default Rate by Bank Histogram (3000+ loans)", cutoff=3000, bins=10)
@@ -180,7 +184,6 @@ if __name__ == "__main__":
         plot_default_rate(df, 'Bank', "Loan Default Rate by Bank Histogram (1000+ loans)", cutoff=1000, bins=10)
         plt.savefig('images/default_bank_1000.png')
         plt.close()
-
 
     ### Additional feature engineering and save final data to pickle file
     update_data = 0
@@ -197,7 +200,6 @@ if __name__ == "__main__":
                                             62:1, 55:1, 11:0, 21:0, 0:0})
         
         df_loan = df[['StateRisk', 'SectorRisk', 'Term', 'NumEmp','LowDocu', 'GrAppv', 'SBA_g', 'U_rate','Default']]
-
         df_loan.to_pickle('data/loan_data')   
 
     ### PCA analysis
