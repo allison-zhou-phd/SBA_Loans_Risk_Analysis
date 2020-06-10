@@ -3,34 +3,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from time import time
 
+from sklearn.model_selection import train_test_split
 from tensorflow import keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation
 from tensorflow.keras.optimizers import SGD, Adam
-from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.metrics import FalseNegatives, FalsePositives, TrueNegatives, TruePositives, Precision, Recall
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler 
 from sklearn.metrics import accuracy_score, roc_auc_score
 
-def load_split_data():
-    """ 
-        Load data in 
-    Args:
-        train(int): option to control whether all features will be used
-    Returns:
-        Train_test datasets for X and y, as well as a list for column names
-    """
-    df_loan = pd.read_pickle('data/loan_data')
-    feature_choice = ['Term', 'GrAppv', 'U_rate', 'SBA_g', 'SectorRisk', 'Default']
-    df_loan = df_loan[feature_choice]
-
-    y = df_loan.pop('Default').values
-    X = df_loan.values
-    col_names = df_loan.columns
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, stratify=y)
-    return (X_train, X_test, y_train, y_test), col_names
+from src.default_modeler import load_split_data
 
 def get_weights(y_train):
     """
@@ -89,24 +73,30 @@ def define_mlp_model(n_input):
     return model
 
 if __name__ == '__main__':
-    (X_model, X_holdout, y_model, y_holdout), col_names = load_split_data()
+    (X_model, X_holdout, y_model, y_holdout), col_names = load_split_data(select=1)
     X_train, X_test, y_train, y_test = train_test_split(X_model, y_model, test_size=0.1, random_state=42, stratify=y_model)
     
+    ### Standardize features
     scaler = StandardScaler(copy=True, with_mean=True, with_std=True)
     X_std = scaler.fit_transform(X_train)
     X_test_std = scaler.transform(X_test)
     X_holdout_std = scaler.transform(X_holdout)
 
-    # Building and tuning a neural network model
+    ### Building and tuning a neural network model
     n_input = X_std.shape[1]
     weight_for_0, weight_for_1 = get_weights(y_train)
     weights ={0:weight_for_0, 1:weight_for_1}
+    
     ts = time()
     model = define_mlp_model(n_input)
     model.fit(X_std, y_train, epochs=30, batch_size=2048, verbose=2, 
               validation_data=(X_test_std, y_test), class_weight=weights)
     yhat = model.predict(X_holdout_std)
     score = roc_auc_score(y_holdout, yhat)
-    print('ROC AUC: %.3f' % score)
     te= time()
+    print('ROC AUC: %.3f' % score)
     print("Time passed:", te-ts)
+
+    save_model = 0
+    if save_model:
+        model.save("static/model_mlp.h5") 

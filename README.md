@@ -265,7 +265,7 @@ The below chart shows the partial dependence plot on the first five important fe
 
 ![](images/gbc_partDepend.png)
 
-Given the feature importance study, I made a decison to further reduce the number of explanatory to five: the loan term('Term'), the unemployment rate ('U_rate'), the SBA guanranteed ratio ('SBA_g'), the gross loan amount ('GrAppv'), and the sector risk ('SectorRisk') and proceed with the Gradient Boosting model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
+Given the feature importance study, I made a decison to further reduce the number of explanatory to five: the loan term(Term), the unemployment rate (U_rate), the SBA guanranteed ratio (SBA_g), the gross loan amount (GrAppv), and the sector risk (SectorRisk) and proceed with the Gradient Boosting model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
 
  | Parameter        | Optimal | Gridsearch Values |
  |------------------|--------:|------------------:|

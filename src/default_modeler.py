@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 class DefaultModeler(object):
@@ -101,3 +102,22 @@ def undersample(X, y, tp):
     X_undersampled = np.vstack((X_neg_undersampled, X_pos))
     y_undersampled = np.concatenate((y_neg_undersampled, y_pos))
     return X_undersampled, y_undersampled
+
+def load_split_data(select=0):
+    """ 
+        Load data in
+    Args:
+        select(int): option to control whether selective features will be used 
+    Returns:
+        Train_test datasets for X and y, as well as a list for column names
+    """
+    df_loan = pd.read_pickle('data/loan_data')
+    if select:
+        feature_choice = ['Term', 'GrAppv', 'U_rate', 'SBA_g', 'SectorRisk', 'Default']
+        df_loan = df_loan[feature_choice]
+
+    y = df_loan.pop('Default').values
+    X = df_loan.values
+    col_names = df_loan.columns
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, stratify=y)
+    return (X_train, X_test, y_train, y_test), col_names
