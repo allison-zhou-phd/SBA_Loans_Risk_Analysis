@@ -226,62 +226,62 @@ To solve the imbalanced classes problem, two options are evaluated in the study:
 
 * Perform resampling to balance the dataset before feeding the data to the model.  Because there is enough data points for both the minority and majority classes, I choose to undersample the majority class to arrive at a target ratio of 0.45 for the minority class. After undersampling is performed, I have a dataset of 276,579 observations. 
 
-Both of these options are tried on four types of models: Logistic Regression, Random Forest, Gradient Boost Classifier, and AdaBoost Classifier.  The resulting model metrics on the test data are listed in the below table.  All models are run on the selected eight explanatory variables.  
+Both of these options are tried on four types of models: Logistic Regression, Random Forest, Gradient Boosting Classifier, and AdaBoost Classifier.  The resulting model metrics on the test data are listed in the below table.  All models are run on the selected eight explanatory variables.  
 
-    | Models              | Class_weight | Undersample |
-    |---------------------|-------------:|------------:|
-    | __Logistic Regression__ |              |             |
-    |    Precision        |        0.367 |       0.369 |
-    |    Recall           |        0.071 |       0.056 |
-    |    Accuracy         |        0.816 |       0.818 |
-    | __Random Forest__       |              |             |
-    |    Precision        |        0.836 |       0.770 |
-    |    Recall           |        0.746 |       0.994 |
-    |    Accuracy         |        0.930 |       0.947 |
-    | __Gradient Boost__      |              |             |
-    |    Precision        |        0.847 |       0.704 |
-    |    Recall           |        0.771 |       0.904 |
-    |    Accuracy         |        0.935 |       0.917 |
-    | __Ada Boost__           |              |             |
-    |    Precision        |        0.848 |       0.697 |
-    |    Recall           |        0.763 |       0.900 |
-    |    Accuracy         |        0.934 |       0.914 |
+ | Models              | Class_weight | Undersample |
+ |---------------------|-------------:|------------:|
+ | __Logistic Regression__ |              |             |
+ |    Precision        |        0.367 |       0.369 |
+ |    Recall           |        0.071 |       0.056 |
+ |    Accuracy         |        0.816 |       0.818 |
+ | __Random Forest__       |              |             |
+ |    Precision        |        0.836 |       0.770 |
+ |    Recall           |        0.746 |       0.994 |
+ |    Accuracy         |        0.930 |       0.947 |
+ | __Gradient Boosting__      |              |             |
+ |    Precision        |        0.847 |       0.704 |
+ |    Recall           |        0.771 |       0.904 |
+ |    Accuracy         |        0.935 |       0.917 |
+ | __Ada Boost__           |              |             |
+ |    Precision        |        0.848 |       0.697 |
+ |    Recall           |        0.763 |       0.900 |
+ |    Accuracy         |        0.934 |       0.914 |
 
-Three model performance metrics between the two sampling options are listed: __Precision__, __Recall__ and __Accuracy__.  For this study, we care first and foremost about the __Precision__ metric.  That is, we don't want to predict a loan going into default when it doesn't in fact.  Ultimately, the goal of SBA loan guarantee is to assist small business owners in obtaining much needed capital for growth. Secondly, we would also want the model to have a good overall accuracy rate after the imbalanced dataset problem is corrected.  Based on these two criteria, the class_weight option is chosen.  Amongst the model tested, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boost to identify the features of importance.   
+Three model performance metrics between the two sampling options are listed: __Precision__, __Recall__ and __Accuracy__.  For this study, we care first and foremost about the __Precision__ metric.  That is, we don't want to predict a loan going into default when it doesn't in fact.  Ultimately, the goal of SBA loan guarantee is to assist small business owners in obtaining much needed capital for growth. Secondly, we would also want the model to have a good overall accuracy rate after the imbalanced dataset problem is corrected.  Based on these two criteria, the class_weight option is chosen.  Amongst the model tested, a linear model like Logistic Regression performs significantly worse than the other three non-linear models.  Out of the three non-linear models, performance is pretty much on-par with each other.  In the next modeling section, I will use both Random Forest and Gradient Boosting to identify the features of importance.   
 
 ### 4.2. Modeling & Comparison <a name="compare"></a>
 
-With the original eight features, a Random Forest model and a Gradient Boost model are fitted separately while setting the class_weight option to balanced.  The goal is see if both models will identify the same set of important features.
+With the original eight features, a Random Forest model and a Gradient Boosting model are fitted separately while setting the class_weight option to balanced.  The goal is see if both models will identify the same set of important features.
 
 * __Random Forest Model__ - as the below chart indicates, the most imoportant feature in predicting loan default risk is the loan term, explaining about 58% of the information gain.  This is followed by the gross loan amount, the unemployment rate, the number of employees, and SBA guaranteed ratio. 
 
 ![](images/rfc_feature_importances.png)
 
-* __Gradient Boost Model__ - Like the Random Forest model, the most important feature is the loan term, explaining almost 78% of the information gain.  In a decreasing order, the next four important features are the unemployment rate, the SBA guaranteed ratio, the gross loan amount, and the sector risk.  There is actually a very good overlap between the two models. Four out of the five most important features are the same.  
+* __Gradient Boosting Model__ - Like the Random Forest model, the most important feature is the loan term, explaining almost 78% of the information gain.  In a decreasing order, the next four important features are the unemployment rate, the SBA guaranteed ratio, the gross loan amount, and the sector risk.  There is actually a very good overlap between the two models. Four out of the five most important features are the same.  
 
 ![](images/gbc_feature_importances.png)
 
-The below chart shows the partial dependence plot on the first five important features for the Gradient Boost model. 
+The below chart shows the partial dependence plot on the first five important features for the Gradient Boosting model. 
 
 ![](images/gbc_partDepend.png)
 
-Given the feature importance study, I made a decison to further reduce the number of explanatory to five: the loan term('Term'), the unemployment rate ('U_rate'), the SBA guanranteed ratio ('SBA_g'), the gross loan amount ('GrAppv'), and the sector risk ('SectorRisk') and proceed with the Gradient Boost model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
+Given the feature importance study, I made a decison to further reduce the number of explanatory to five: the loan term('Term'), the unemployment rate ('U_rate'), the SBA guanranteed ratio ('SBA_g'), the gross loan amount ('GrAppv'), and the sector risk ('SectorRisk') and proceed with the Gradient Boosting model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
 
-| Parameter        | Optimal | Gridsearch Values |
-|------------------|--------:|------------------:|
-| learning_rate    |    0.2  |  [0.2, 0.1, 0.05] |
-| max_depth        |       5 |            [3, 5] |
-| min_samples_leaf |      50 |    [50, 100, 200] |
-| max_features     |       3 |            [2, 3] |
-| n_estimators     |     500 |        [300, 500] |
-| random_state     |       2 |                 2 |
+ | Parameter        | Optimal | Gridsearch Values |
+ |------------------|--------:|------------------:|
+ | learning_rate    |    0.2  |  [0.2, 0.1, 0.05] |
+ | max_depth        |       5 |            [3, 5] |
+ | min_samples_leaf |      50 |    [50, 100, 200] |
+ | max_features     |       3 |            [2, 3] |
+ | n_estimators     |     500 |        [300, 500] |
+ | random_state     |       2 |                 2 |
 
 
 ### 4.3. Final Model <a name="final"></a>
 
-A final Gradient Boost model with the optimal hyper-parameters and five explanatory variables are fit on the entire training dataset.  The fitted model is then used to predict the loan defaults on the holdout data set aside from the beginning (20% of overall data).  The performance metrics are listed below. 
+A final Gradient Boosting model with the optimal hyper-parameters and five explanatory variables are fit on the entire training dataset.  The fitted model is then used to predict the loan defaults on the holdout data set aside from the beginning (20% of overall data).  The performance metrics are listed below. 
 
-| Gradient Boost Model|      Metrics | 
+| Gradient Boosting Model|      Metrics | 
 |---------------------|-------------:|
 |    Precision        |        0.842 |
 |    Recall           |        0.805 |
