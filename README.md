@@ -281,15 +281,22 @@ Given the feature importance study, I made a decison to further reduce the numbe
 
 ### 4.3. Multi-layer Perceptron (MLP) Model <a name="mlp"></a>
 
-Machine learning models have different characteristics.  Each has its own pro's and con's.  The Gradient Boosting Classifier is a type of ensemble model that has good predicting performance. It is also able to identify key features projecting if a SBA loan will go into default.  Neural networks models have gained popularity in recent years.  These types of models aim at mimicking the human brain in learning and action.  However, the downside is the neural network models are not inferential.  They functions primarily as a black-box and a forecasting tool.  I thought it would be good to give neural networks models a try.  My goal is to see if added comlexity in model structure help predict defaults better. 
+Machine learning models have different characteristics.  Each has its own pro's and con's.  The Gradient Boosting Classifier is a type of ensemble model that has good predicting performance. It is also able to identify key features in projecting if a SBA loan will go into default.  Neural networks models have gained popularity in recent years.  These types of models aim at mimicking the human brain in learning and action.  However, the downside is the neural network models are not inferential.  They functions primarily as a black-box and a forecasting tool.  I thought it would be good to give neural networks models a try.  My goal is to see if added comlexity in model structure help predict defaults better. 
 
-Multi-layer Perceptron (MLP) model is a vanilla type of neural network models.  It has been used for pattern, speech, and image recognition tasks and obtained decent results.  The below chart illustrates the MLP model structure.  In the chart, one hidden layer and one output layer are shown.  Each layer can have different number of neurons and activation function.  The model weights are randomly initiated upfront.  A backpropagation process through partial differential equations and gradient descend then updates the weights in a recursive way, with the goal to minimize the loss function. 
+Multi-layer Perceptron (MLP) model is a vanilla type of neural network models.  It has been used for pattern, speech, and image recognition tasks and obtained decent results.  The below chart illustrates the MLP model structure.  In the chart, one hidden layer and one output layer are shown.  Each layer can have different number of neurons and/or activation functions.  The model weights are randomly initiated upfront.  A backpropagation process through partial differential equations and gradient descend then updates the weights in a recursive way, with the goal to minimize the loss function. 
 
 ![](images/mlp_structure.png)
 
+I constructed an MLP model with an input layer, two hidden layers, and an output layer.  Each layer has 256 neurons.  A dropout layer of 30% is also added after each hidden layer to condense the feature extraction.  The output layer incurs the sigmoid function since predicting loan default is a binary classification problem. This model is uploaded to an AWS P2.xlarge instance and fine-tuned there.  A standardization of features are performed before feeding them to the model.  This is not required, yet research has indicated that standardization has helped in helping the model learn.  Last but not least, class-weighting is added as the inverse of class counts.  All codes are found in the model_mlp.py script. 
 
+Contrary to my initial thought, the MLP model didn't improve overall model performance.  I will illustrate this more in the next section. 
 
 ### 4.4. ROC and Profit Curves <a name="profit"></a>
+
+I have the following threee competing models at this time.  Which one performs the best? 
+* Logistic Regression
+* Gradient Boosting Classifier
+* Multi-layer Perceptron
 
 ### 4.5. Final Model <a name="final"></a>
 
