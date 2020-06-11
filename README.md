@@ -13,7 +13,7 @@
    1. [Balancing Classes](#sample)
    2. [Ensemble Models](#gbc)
    3. [Multi-layer Perceptron (MLP) Model](#mlp)
-   4. [Profit Curve](#profit)
+   4. [Model Performance - ROC and Profit Curves](#profit)
    5. [Final Model](#final)
 5. [Conclusion](#result)
 6. [Citation](#cite)
@@ -27,7 +27,7 @@ One way the SBA provides assistance to small businesses is to provide easier acc
 
 We are in the midst of the pandemic Covid-19.  It has brought sudden and significant threats not only to human health but also to normal economic operations when people stay at home to "flatten the curve".  Many small businesses are suffering.  The Coronavirus Aid, Relief, and Economic Secuirty (CARES) Act was passed by Congress and signed into law by the president on March 27, 2020.  The core of CARES Act is to provide loans to small business owners in maintaining payroll.  The initial tranche of $349 billion in funding was quickly exghausted in merely 13 days.  A second tranche of $310 billion was added on April 23, 2020.  As of June 6, more than 4.42 million loans worth roughly $510 billion had been distributed through the program, leaving roughly $100 billion remaining in the fund. PPP loans are forgiveable if used within guidance. 
 
-This made me wonder - how did SBA loans perform historically?  Some initial investigation shows that one in six SBA guaranteed commercial loans actually ended up in default.  In this study, I would like to research what factors are primary in predicting if a loan will go into default.  I would also like to build a model that has good forecasting capabilities on unseen data.  
+This made me wonder - how did SBA loans perform historically?  Some initial investigation shows that one in six SBA guaranteed commercial loans actually ended up in default.  In this study, I would like to research what factors are primary in predicting if a loan will go into default.  I would also like to build a model that can help the banker in making the decision of what SBA loan applications to approve.  
 
 ## 2. Data <a name="data"></a>
 
@@ -291,7 +291,7 @@ I constructed an MLP model with an input layer, two hidden layers, and an output
 
 Contrary to my initial thought, the MLP model didn't improve overall model performance.  I will illustrate this point more in the next section. 
 
-### 4.4. ROC and Profit Curves <a name="profit"></a>
+### 4.4. Model Performance - ROC and Profit Curves <a name="profit"></a>
 
 I have the following three competing models at this time.  Which one performs the best? 
 * Logistic Regression
@@ -300,7 +300,7 @@ I have the following three competing models at this time.  Which one performs th
 
 Because all are classifiers, one way to compare them is the area under the ROC curve.  The ROC curve illustrates the trade-off between the true positive rate and the false positive rate for each level of the threshold.  The 45&deg; line represents random guessing with an area under the curve (AUC) score of 0.5.  Therefore, the bigger the total area under the ROC curve, the better the model performance.  The below chart shows the ROC curve for each of the three competing models.  As we can see, the Gradient Boosting Classifier performs the best.  
 
-![](images/ROC_curve.png)
+![](images/roc_curve.png)
 
 | Model                        | ROC AUC Score |
 |------------------------------|--------------:|
@@ -308,7 +308,20 @@ Because all are classifiers, one way to compare them is the area under the ROC c
 | Gradient Boosting Classifier | 0.971         |
 | Multi-layer Perceptron       | 0.922         |
 
+Going back to the original question - what loan(s) should the banker approve when faced with a ton of applications?  We need to introduce one more assumption to convert the model predicted default probability to dollar ($) terms.  Here I am assuming: 
 
+* Average loan pay-off in 7 years with an interst rate of 7.5%
+* If a loan were to default, it defaults roughly at 3.5 year mark
+* It costs $5,000 for checking potential defaults
+* All returns are normalized to $100,000 notionals in loan amounts
+
+With these assumptions, the cost-benefit matrix looks like the following: 
+
+![](images/cost_benefit_matrix.png)
+
+And the profit curves for the three competing models: 
+
+![](images/profit_curve.png)
 
 ### 4.5. Final Model <a name="final"></a>
 
