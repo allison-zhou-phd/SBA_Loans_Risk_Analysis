@@ -287,16 +287,28 @@ Multi-layer Perceptron (MLP) model is a vanilla type of neural network models.  
 
 ![](images/mlp_structure.png)
 
-I constructed an MLP model with an input layer, two hidden layers, and an output layer.  Each layer has 256 neurons.  A dropout layer of 30% is also added after each hidden layer to condense the feature extraction.  The output layer incurs the sigmoid function since predicting loan default is a binary classification problem. This model is uploaded to an AWS P2.xlarge instance and fine-tuned there.  A standardization of features are performed before feeding them to the model.  This is not required, yet research has indicated that standardization has helped in helping the model learn.  Last but not least, class-weighting is added as the inverse of class counts.  All codes are found in the model_mlp.py script. 
+I constructed an MLP model with an input layer, two hidden layers, and an output layer.  Each layer has 256 neurons.  A dropout layer of 30% is also added after each hidden layer to condense the feature extraction.  The output layer incurs the sigmoid function since predicting loan default is a binary classification problem. This model is uploaded to an AWS P2.xlarge instance and fine-tuned there using Tensorflow.  A standardization of features are performed before feeding them to the model.  This is not required, yet research has indicated that standardization can help the model learn.  Last but not least, class-weighting is added as the inverse of class counts.  All codes are found in the script "src/model_mlp.py". 
 
-Contrary to my initial thought, the MLP model didn't improve overall model performance.  I will illustrate this more in the next section. 
+Contrary to my initial thought, the MLP model didn't improve overall model performance.  I will illustrate this point more in the next section. 
 
 ### 4.4. ROC and Profit Curves <a name="profit"></a>
 
-I have the following threee competing models at this time.  Which one performs the best? 
+I have the following three competing models at this time.  Which one performs the best? 
 * Logistic Regression
 * Gradient Boosting Classifier
 * Multi-layer Perceptron
+
+Because all are classifiers, one way to compare them is the area under the ROC curve.  The ROC curve illustrates the trade-off between the true positive rate and the false positive rate for each level of the threshold.  The 45&deg; line represents random guessing with an area under the curve (AUC) score of 0.5.  Therefore, the bigger the total area under the ROC curve, the better the model performance.  The below chart shows the ROC curve for each of the three competing models.  As we can see, the Gradient Boosting Classifier performs the best.  
+
+![](images/ROC_curve.png)
+
+| Model                        | ROC AUC Score |
+|------------------------------|--------------:|
+| Logistic Regression          | 0.821         |
+| Gradient Boosting Classifier | 0.971         |
+| Multi-layer Perceptron       | 0.922         |
+
+
 
 ### 4.5. Final Model <a name="final"></a>
 
