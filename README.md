@@ -323,9 +323,11 @@ And the profit curves for the three competing models:
 
 ![](images/profit_curve.png)
 
+The horizontal axis (x-axis) ranks the total number of loans from the least likely to default to the most likely.  It represents the percentage of overall loan applications.  The vertical axis (y-axis) represents the profits from loans ($).  It is clear that there is a decreasing to loan approval going on across all three models.  Gradient Boosting Classifier is still the best performing model.  If the bank can loan to as many entities as possible, the optimal profit is found at roughtly 42% of overall approval rate.  If there is constraints, the optimal might be found on the lower end of the profit curve. 
+
 ### 4.5. Final Model <a name="final"></a>
 
-A final Gradient Boosting model with the optimal hyper-parameters and five explanatory variables are fit on the entire training dataset.  The fitted model is then used to predict the loan defaults on the holdout data set aside from the beginning (20% of overall data).  The performance metrics are listed below. 
+In the end, I settled on the final model - Gradient Boosting Classifier, with the optimal hyper-parameters and five explanatory variables identified in __Section 4.2__.  The final model is fitted on the entire training dataset and then used to predict the loan defaults on the holdout data set aside from the beginning (20% of overall data, ~177,000 records).  The performance metrics on the hold-out set are listed below. 
 
 | Gradient Boosting Model|      Metrics | 
 |---------------------|-------------:|
@@ -333,21 +335,21 @@ A final Gradient Boosting model with the optimal hyper-parameters and five expla
 |    Recall           |        0.805 |
 |    Accuracy         |        0.939 |
 
-A final Logistic model is also fitted with the selected five explanatory variables after standardardization.  The model coefficients are as the following:
+As a final check, a Logistic Regression model is also fitted with the selected five explanatory variables after standardardization.  The model coefficients are listed in the below table.  All coefficients have significant p-values.
 
 | Variable    | Intercept |  Term | GrAppv | U_rate | SBA_g | SectorRisk |
 |-------------|----------:|------:|-------:|------:|-------:|-----------:|
 | Coefficient |     -2.37 | -1.95 |  0.19  | -0.31 |   0.02 |       0.34 |
 
-Signs on variables 'Term' and 'SectorRisk' are as expected.  Longer loan terms typically requires collaterals therefore reducing default risk.  Higher sector risk leads to higher probability that a loan will go into default.  Sign on the other three variables are counter-intuitive. We would expect higher unemployment rates to indicate tougher economic times, therefore leading to more loan defaults.  Bigger loan notional or SBA guaranteed ratio should result in lower default risks.  But these parameters are small and many factors can affect the signs such as colinearity between the feature variables.  Ultimately the relationship between the loan default and explanatory variables is non-linear.
+Signs on variables 'Term' and 'SectorRisk' are as expected.  Longer loan terms typically requires collaterals therefore reducing default risk.  Higher sector risk leads to higher probability that a loan will go into default.  Sign on the other three variables are counter-intuitive. We would expect higher unemployment rates to indicate tougher economic times, therefore leading to more loan defaults.  Bigger loan notional or SBA guaranteed ratio should result in lower default risks.  But these parameters are small and many factors can affect the signs such as colinearity between the feature variables.  Ultimately the relationship between the loan default and explanatory variables is non-linear (therefore the ensemble model Gradient Boosting Classifier performed the best).
 
 ## 5. Conclusion <a name="result"></a>
 
-The loan default classifier was trained on the training dataset of ~710,000 loans and tested on the holdout test set of ~177,500 loans.  The model performance has been satisfactory with 93.9% overall accuracy.  Precision rate dropped slightly from 84.7% in the training/test set to 84.2%.  For the hold-out set, the predicted v.s. true values are listed in the below confusion matrix:
+The loan default classifier was trained on the training dataset of ~710,000 loans and tested on the holdout test set of ~177,500 loans.  The model performance has been satisfactory with 93.9% overall accuracy.  From the bank's perspective, if it cares mostly about profits, it will want the model to have good recall scores.  That is, having low false negative rates.  For the final model, the recall rate is at decent level of 80.5% when using 50% as threshold (which means for loans with a default probability of 50% or higher, the model will predict a default).  For the hold-out set, the predicted v.s. true values are listed in the below confusion matrix:
 
 ![](images/confusion_matrix.png)
 
-For further research,  I would like to try other deep learning models on this dataset such as the multi-level perceptron (MLP).
+For further research,  I would like to spend more time on the MLP model in hope to get better performance.  I also hope to build a Flask app such that it can be linked to loan applications and quickly generate probability of default to help the banker to screen through loan applications. 
 
 ## 6. Citation <a name="cite"></a>
 * [Small Business Administration (SBA)](https://www.sba.gov/)
