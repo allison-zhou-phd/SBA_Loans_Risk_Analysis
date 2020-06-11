@@ -86,14 +86,14 @@ if __name__ == "__main__":
         y_pred_gbc = gbc.predict_proba(X_holdout)[:,1]
         fpr_gbc, tpr_gbc, thresholds_gbc = roc_curve(y_holdout, y_pred_gbc)
         profit_gbc = tpr_gbc * cost_benefit[0,0] + fpr_gbc * cost_benefit[0,1]
-        model_profits.append(('GradientBoostedClassifier', gbc, profit_gbc, thresholds_gbc))
+        model_profits.append(('GradientBoostingClassifier', gbc, profit_gbc, thresholds_gbc))
         score = roc_auc_score(y_holdout, y_pred_gbc)
         print('ROC AUC: %.3f' % score)
         te= time()
         print("Time passed:", te-ts) 
 
     ### Load the final Logistic model
-    model_lg = 1
+    model_lg = 0
     if model_lg:
         print('\nLoad LR model')
         ts = time()
@@ -109,7 +109,7 @@ if __name__ == "__main__":
         print("Time passed:", te-ts) 
 
     ### Load the final mlp model
-    model_mlp = 1
+    model_mlp = 0
     if model_mlp:
         print('\nLoad MLP model')
         ts = time()
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     if plot_roc:
         plt.figure(1)
         plt.plot([0, 1], [0, 1], 'k--')
-        plt.plot(fpr_gbc, tpr_gbc, label='GradientBoostedClassifier')
+        plt.plot(fpr_gbc, tpr_gbc, label='GradientBoostingClassifier')
         plt.plot(fpr_lg, tpr_lg, label='LogisticRegression')
         plt.plot(fpr_mlp, tpr_mlp, label='MultiLayerPerceptron')
         plt.xlabel('False positive rate')
@@ -141,7 +141,10 @@ if __name__ == "__main__":
     ### Plot the Profit Curve
     plot_profit = 1
     if plot_profit:
-        plot_model_profits(model_profits, 'images/profit_curve.png')
+        if model_lg and model_mlp:
+            plot_model_profits(model_profits, 'images/profit_curve.png')
+        else:
+            plot_model_profits(model_profits, 'images/profit_curve_1model.png')
 
     ### Find the max profit and corresponding model and threshold
     find_max = 0

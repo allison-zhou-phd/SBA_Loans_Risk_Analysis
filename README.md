@@ -268,7 +268,7 @@ The below chart shows the partial dependence plot on the first five important fe
 
 ![](images/gbc_partDepend.png)
 
-Given the feature importance study, I made a decison to further reduce the number of explanatory to five: the loan term(Term), the unemployment rate (U_rate), the SBA guanranteed ratio (SBA_g), the gross loan amount (GrAppv), and the sector risk (SectorRisk) and proceed with the Gradient Boosting model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
+Given the feature importance study, I made a decison to further reduce the number of explanatory to five: the loan term(Term), the unemployment rate (U_rate), the SBA guanranteed ratio (SBA_g), the gross loan amount (GrAppv), and the sector risk (SectorRisk), and proceed with the Gradient Boosting model as the final model.  A grid search is performed in hope to fine tune the hyper-parameters. 
 
  | Parameter        | Optimal | Gridsearch Values |
  |------------------|--------:|------------------:|
@@ -281,7 +281,15 @@ Given the feature importance study, I made a decison to further reduce the numbe
 
 ### 4.3. Multi-layer Perceptron (MLP) Model <a name="mlp"></a>
 
-### 4.4. Profit Curve <a name="profit"></a>
+Machine learning models have different characteristics.  Each has its own pro's and con's.  The Gradient Boosting Classifier is a type of ensemble model that has good predicting performance. It is also able to identify key features projecting if a SBA loan will go into default.  Neural networks models have gained popularity in recent years.  These types of models aim at mimicking the human brain in learning and action.  However, the downside is the neural network models are not inferential.  They functions primarily as a black-box and a forecasting tool.  I thought it would be good to give neural networks models a try.  My goal is to see if added comlexity in model structure help predict defaults better. 
+
+Multi-layer Perceptron (MLP) model is a vanilla type of neural network models.  It has been used for pattern, speech, and image recognition tasks and obtained decent results.  The below chart illustrates the MLP model structure.  In the chart, one hidden layer and one output layer are shown.  Each layer can have different number of neurons and activation function.  The model weights are randomly initiated upfront.  A backpropagation process through partial differential equations and gradient descend then updates the weights in a recursive way, with the goal to minimize the loss function. 
+
+![](images/mlp_structure.png)
+
+
+
+### 4.4. ROC and Profit Curves <a name="profit"></a>
 
 ### 4.5. Final Model <a name="final"></a>
 
