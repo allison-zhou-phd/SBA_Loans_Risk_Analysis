@@ -127,14 +127,13 @@ if __name__ == "__main__":
         plt.close()
 
     df = pd.read_pickle('data/pickled_loan')
-    df.drop(['grouper','Date'], axis=1, inplace=True)
 
     ### Plot loan default rates by states
     state = 0
     if state:
         df_state = df.groupby('State').mean()['Default']*100
         columns =['State', 'Default_Rate']
-        m = heatmap_state(df_state, columns, 'Default Rate (%)', 'YlGn')
+        m = heatmap_state(df_state, columns, 'Default Rate (%)', 'YlOrRd')
 
     ### Plot loan default rates by sectors
     sector = 1

@@ -1,4 +1,4 @@
-*.csv
+SBAnational.csv
 *checkpoint.ipynb
 .DS_Store
 *_copy.py
